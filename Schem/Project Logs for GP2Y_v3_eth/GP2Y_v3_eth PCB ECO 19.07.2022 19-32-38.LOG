@@ -1,0 +1,12 @@
+Added Component: Designator=H1(Hole 3)
+Added Component: Designator=H2(Hole 3)
+Added Component: Designator=H3(Hole 3)
+Added Component: Designator=H4(Hole 3)
+Added Pin To Net: NetName=AGND Pin=H1-0
+Added Pin To Net: NetName=AGND Pin=H2-0
+Added Pin To Net: NetName=AGND Pin=H3-0
+Added Pin To Net: NetName=AGND Pin=H4-0
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component H1 Hole
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component H2 Hole
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component H3 Hole
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component H4 Hole

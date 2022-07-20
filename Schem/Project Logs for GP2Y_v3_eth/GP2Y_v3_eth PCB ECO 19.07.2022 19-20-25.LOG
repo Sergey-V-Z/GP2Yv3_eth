@@ -1,0 +1,12 @@
+Added Component: Designator=X2(XTAL_3.2_2.5)
+Added Component: Designator=X3(XTAL_3.2_2.5)
+Added Pin To Net: NetName=NetC17_2 Pin=X2-1
+Added Pin To Net: NetName=AGND Pin=X2-2
+Added Pin To Net: NetName=NetC3_2 Pin=X2-3
+Added Pin To Net: NetName=AGND Pin=X2-4
+Added Pin To Net: NetName=NetC27_2 Pin=X3-1
+Added Pin To Net: NetName=AGND Pin=X3-2
+Added Pin To Net: NetName=NetC28_2 Pin=X3-3
+Added Pin To Net: NetName=AGND Pin=X3-4
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component X2 25Mhz
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component X3 12Mhz
