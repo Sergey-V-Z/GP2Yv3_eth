@@ -1,0 +1,26 @@
+Added Component: Designator=1(TSOT23-5L)
+Add component (AddParameter): Name = "Availability"; Value = "Unavailable"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MF"; Value = "Analog Devices"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "MP"; Value = "ADP122AUJZ-3.3-R7"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Package"; Value = "TSOT-5 Analog Devices"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Price"; Value = "None"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SnapEDA_Link"; Value = "https://www.snapeda.com/parts/ADP122AUJZ-3.3-R7/Analog%20Devices%20Inc./view-part/231148/?ref=snap"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=R22(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "NC 0"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=+5v Pin=1-1
+Added Pin To Net: NetName=AGND Pin=1-2
+Added Pin To Net: NetName=+5v Pin=1-3
+Added Pin To Net: NetName=+3.3v_E Pin=1-5
+Added Pin To Net: NetName=+3.3v Pin=R22-1
+Added Pin To Net: NetName=+3.3v_E Pin=R22-2
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component 1 ADP122AUJZ-3.3-R7
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R22 NC 0
