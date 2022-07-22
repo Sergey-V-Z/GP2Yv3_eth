@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : PCB Document [GP2Y_v3_eth.PcbDoc]
+   Generated File[GP2Y_v3_eth.TXT]
+   Generated File[GP2Y_v3_eth.LDP]
+   Generated File[GP2Y_v3_eth.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 17:10:28 On 22.07.2022
