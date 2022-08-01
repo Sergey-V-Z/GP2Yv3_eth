@@ -1,0 +1,34 @@
+Change component parameters: Designator = "C6" ("C6"); Footprint = "CAPACITOR 0603"; UniqueID = "\HLOPZDDI" ("\HLOPZDDI")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 0.1uF  "; VariantName = "[No Variations]"
+Change component parameters: Designator = "C12" ("C12"); Footprint = "CAPACITOR 0603"; UniqueID = "\UTJZSPJK" ("\UTJZSPJK")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 0.1uF  "; VariantName = "[No Variations]"
+Change component parameters: Designator = "C22" ("C22"); Footprint = "CAPACITOR 0603"; UniqueID = "\PAILTRVR" ("\PAILTRVR")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 0.1uF  "; VariantName = "[No Variations]"
+Change component parameters: Designator = "C24" ("C24"); Footprint = "CAPACITOR 0603"; UniqueID = "\GFLSKZDQ" ("\GFLSKZDQ")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 0.1uF  "; VariantName = "[No Variations]"
+Change component parameters: Designator = "R6" ("R6"); Footprint = "Resistor 0603"; UniqueID = "\JGSANVYA" ("\JGSANVYA")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 1.5K  "; VariantName = "[No Variations]"
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component 1 ADP122AUJZ-3.3-R7
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C2 0.1uF
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C3 220uF 50v
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C5 0.1uF
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C17 0.1uF
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C19 Cap T
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C20 0603 0.1uF
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component C21 0603 0.1uF
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R1 0603 10K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R2 NC 0
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R3 0603 3K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R4 0603 1K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R6 0603 1.5K  
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R7 0603 1.5K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R8 510
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R9 0603 1.5K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R10 0603 10K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R11 0603 0
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R12 0603 10K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R13 0603 0
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R16 0603 50R
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R17 0603 50R
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R22 0603 12.1k
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R23 0603 220 Îì
