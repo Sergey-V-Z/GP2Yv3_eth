@@ -1,7 +1,0 @@
-Removed Pin From Net: NetName=NetC17_2 Pin=R11-2
-Removed Pin From Net: NetName=NetC17_2 Pin=R13-2
-Removed Member From Class: ClassName=GP2Y_v3_eth Member=R11
-Removed Member From Class: ClassName=GP2Y_v3_eth Member=R13
-Change Component Comment : Designator=R6 Old Comment=0603 1.5K   New Comment=0603 1.5K
-Added Pin To Net: NetName=NetC17_2 Pin=U1-26
-Added Pin To Net: NetName=NetC17_2 Pin=U1-29
