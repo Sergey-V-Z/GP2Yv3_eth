@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : freertos.c
-  * Description        : Code for freertos applications
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2022 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : freertos.c
+ * Description        : Code for freertos applications
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2022 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -31,6 +31,7 @@
 #include "lwip.h"
 using namespace std;
 #include <string>
+#include "api.h"
 #include <iostream>
 #include <vector>
 /* USER CODE END Includes */
@@ -127,10 +128,10 @@ static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
 
 void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
 {
-  *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
-  *ppxIdleTaskStackBuffer = &xIdleStack[0];
-  *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
-  /* place for user code */
+	*ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
+	*ppxIdleTaskStackBuffer = &xIdleStack[0];
+	*pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
+	/* place for user code */
 }
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
@@ -145,7 +146,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
+	/* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */
@@ -154,15 +155,15 @@ void MX_FREERTOS_Init(void) {
   ADC_endHandle = osSemaphoreCreate(osSemaphore(ADC_end), 1);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
+	/* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
 
   /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
+	/* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+	/* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -179,83 +180,83 @@ void MX_FREERTOS_Init(void) {
   ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
+	/* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
 }
 
 /* USER CODE BEGIN Header_mainTask */
 /**
-  * @brief  Function implementing the MainTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the MainTask thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_mainTask */
 void mainTask(void const * argument)
 {
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN mainTask */
-  mem_spi.Init(&hspi3, 0, ChipSelect, WriteProtect, Hold);
+	mem_spi.Init(&hspi3, 0, ChipSelect, WriteProtect, Hold);
 
-  	mem_spi.Read(&settings);
-  	if((settings.BaudRate == 0) | (settings.BaudRate == 0xFFFFFFFF) | resetSettings)
-  	{
-  	      settings.BaudRate = 115200;
-  	      settings.SlaveAddress = 0x02;
-  	      settings.offsetMax = 0;
-  	      settings.offsetMin = 0;
-  	      settings.timeCall = 3000;
-  		mem_spi.Write(settings);
-  	}
+	mem_spi.Read(&settings);
+	if((settings.BaudRate == 0) | (settings.BaudRate == 0xFFFFFFFF) | resetSettings)
+	{
+		settings.BaudRate = 115200;
+		settings.SlaveAddress = 0x02;
+		settings.offsetMax = 0;
+		settings.offsetMin = 0;
+		settings.timeCall = 3000;
+		mem_spi.Write(settings);
+	}
 
-  	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 1);
-  	HAL_TIM_Base_Start_IT(&htim3);
-  	Sensor1.setTimeCall(settings.timeCall);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 1);
+	HAL_TIM_Base_Start_IT(&htim3);
+	Sensor1.setTimeCall(settings.timeCall);
 
-  	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
-  	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
-  	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin, GPIO_PIN_SET);
 
-  /* Infinite loop */
-  for(;;)
-  {
-      osSemaphoreWait(ADC_endHandle, osWaitForever);
-      Sensor1.Filter_SMA(adc_buffer[0]);
-      //Sensor2.Filter_SMA(adc_buffer[1]);
-      //Sensor3.Filter_SMA(adc_buffer[2]);
-      //printf("CH1: %d\r\n",Sensor1.Get_Result());
-      //printf("CH2: %d\r\n",Sensor2.Get_Result());
-      //printf("CH3: %d\r\n",Sensor3.Get_Result());
+	/* Infinite loop */
+	for(;;)
+	{
+		osSemaphoreWait(ADC_endHandle, osWaitForever);
+		Sensor1.Filter_SMA(adc_buffer[0]);
+		//Sensor2.Filter_SMA(adc_buffer[1]);
+		//Sensor3.Filter_SMA(adc_buffer[2]);
+		//printf("CH1: %d\r\n",Sensor1.Get_Result());
+		//printf("CH2: %d\r\n",Sensor2.Get_Result());
+		//printf("CH3: %d\r\n",Sensor3.Get_Result());
 
-      if(call){
-         call = 0;
-         HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
-         Sensor1.Call(&adc_buffer[0]);
-         //Flash_Write(settings, StartSettingsAddres);
-         HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
-      }
-      if(Sensor1.detectPoll()){
-         HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
-      }else{
-         HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
-      }
-      //taskYIELD();
-  }
+		if(call){
+			call = 0;
+			HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
+			Sensor1.Call(&adc_buffer[0]);
+			//Flash_Write(settings, StartSettingsAddres);
+			HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
+		}
+		if(Sensor1.detectPoll()){
+			HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
+		}else{
+			HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+		}
+		//taskYIELD();
+	}
   /* USER CODE END mainTask */
 }
 
 /* USER CODE BEGIN Header_led */
 /**
-* @brief Function implementing the LED thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the LED thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_led */
 void led(void const * argument)
 {
   /* USER CODE BEGIN led */
-  /* Infinite loop */
+	/* Infinite loop */
 	LED_IPadr.Init(G_GPIO_Port, G_Pin);
 	LED_error.Init(R_GPIO_Port, R_Pin);
 	LED_OSstart.Init(B_GPIO_Port, B_Pin);
@@ -305,10 +306,10 @@ void led(void const * argument)
 
 /* USER CODE BEGIN Header_eth_Task */
 /**
-* @brief Function implementing the ethTas thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the ethTas thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_eth_Task */
 void eth_Task(void const * argument)
 {
@@ -451,69 +452,69 @@ void eth_Task(void const * argument)
 								for (int i = 0; i < count_cmd; ++i) {
 									uint32_t temp;
 									switch (arr_cmd[i].cmd) {
-									case 1: // движение
-										switch (arr_cmd[i].data_in) {
-										case 1:
-											arr_cmd[i].err = "OK";
-											break;
-										case 2:
-											arr_cmd[i].err = "OK";
-											break;
-										default:
-											arr_cmd[i].err = "no_valid";
-											break;
-										}
+									case 1: //
+										arr_cmd[i].data_out = (uint32_t)Sensor1.getdetect();
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
 										/*arr_cmd[i].data_out = (uint32_t)pMotor->getStatusDirect();
 										arr_cmd[i].need_resp = true;*/
 										break;
-										case 2: // старт калибровки
-											if(arr_cmd[i].data_in){
+									case 2: //
+										arr_cmd[i].data_out = (uint32_t)Sensor1.Get_Result();
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
 
-												arr_cmd[i].err = "OK";
-											}else{
-												arr_cmd[i].err = "no_valid";
-											}
-											break;
-										case 3: //
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 4://
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 5://
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 6:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 7:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 8:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 9:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 10:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 11:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 12:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 13:
-											arr_cmd[i].err = "no_CMD";
-											break;
-										case 14:
-											arr_cmd[i].err = "no_CMD";
-											break;
+										break;
+									case 3: //
+										arr_cmd[i].data_out = (uint32_t)Sensor1.Depth;
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
+										break;
+									case 4://
+										Sensor1.Depth = arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
+										break;
+									case 5://
+										arr_cmd[i].data_out = (uint32_t)Sensor1.timOut;
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
+										break;
+									case 6:
+										Sensor1.timOut = arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
+										break;
+									case 7:
+							              Sensor1.setTimeCall(arr_cmd[i].data_in);
+							              settings.timeCall = arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
+										break;
+									case 8:
+										mem_spi.Write(settings);
+										arr_cmd[i].err = "OK";
+										break;
+									case 9:
+										call = 1;
+										arr_cmd[i].err = "OK";
+										break;
+									case 10:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 11:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 12:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 13:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 14:
+										arr_cmd[i].err = "no_CMD";
+										break;
 
-										default:
-											arr_cmd[i].err = "err_CMD";
-											break;
+									default:
+										arr_cmd[i].err = "err_CMD";
+										break;
 									}
 								}
 								/*-----------------------------------------------------------------------------------------------------------------------------*/
@@ -550,9 +551,9 @@ void eth_Task(void const * argument)
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
-  /* This is called after the conversion is completed */
+	/* This is called after the conversion is completed */
 
-   osSemaphoreRelease(ADC_endHandle);
+	osSemaphoreRelease(ADC_endHandle);
 
 }
 /* USER CODE END Application */
