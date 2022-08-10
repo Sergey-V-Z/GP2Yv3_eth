@@ -73,6 +73,10 @@ void Error_Handler(void);
 #define B_GPIO_Port GPIOC
 #define eth_NRST_Pin GPIO_PIN_0
 #define eth_NRST_GPIO_Port GPIOA
+#define TRIG2_Pin GPIO_PIN_13
+#define TRIG2_GPIO_Port GPIOD
+#define TRIG1_Pin GPIO_PIN_7
+#define TRIG1_GPIO_Port GPIOC
 #define SPI3_CS_Pin GPIO_PIN_15
 #define SPI3_CS_GPIO_Port GPIOA
 #define WP_Pin GPIO_PIN_0

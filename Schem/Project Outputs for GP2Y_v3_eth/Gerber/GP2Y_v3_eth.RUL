@@ -1,4 +1,4 @@
-DRC Rules Export File for PCB: D:\Kicads Schem\GP2Yv3_eth\Schem\GP2Y_v3_eth.PcbDoc
+DRC Rules Export File for PCB: D:\Radio\Jobe\GP2Yv3_eth\Schem\GP2Y_v3_eth.PcbDoc
 RuleKind=Clearance|RuleName=Clearance_1|Scope=Board|Minimum=39.37
 RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion|Scope=Board|Minimum=4.00
 RuleKind=Width|RuleName=Width|Scope=Board|Minimum=10.00
