@@ -113,11 +113,18 @@ static void ethernet_link_status_updated(struct netif *netif)
   if (netif_is_up(netif))
   {
 /* USER CODE BEGIN 5 */
+	  netif_set_up(netif);
+	  //netif_set_link_up(netif);
+	  //dhcp_start(netif);
+	  NVIC_SystemReset();
 /* USER CODE END 5 */
   }
   else /* netif is down */
   {
 /* USER CODE BEGIN 6 */
+	  netif_set_down(netif);
+	  //netif_set_link_down(netif);
+	  //dhcp_stop(netif);
 /* USER CODE END 6 */
   }
 }
