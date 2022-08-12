@@ -55,10 +55,6 @@
 #define LWIP_DNS 1
 /*----- Value in opt.h for MEM_ALIGNMENT: 1 -----*/
 #define MEM_ALIGNMENT 4
-/*----- Default Value for H7 devices: 0x30044000 -----*/
-#define LWIP_RAM_HEAP_POINTER 0x30044000
-/*----- Value supported for H7 devices: 1 -----*/
-#define LWIP_SUPPORT_CUSTOM_PBUF 1
 /*----- Value in opt.h for LWIP_ETHERNET: LWIP_ARP || PPPOE_SUPPORT -*/
 #define LWIP_ETHERNET 1
 /*----- Value in opt.h for LWIP_DNS_SECURE: (LWIP_DNS_SECURE_RAND_XID | LWIP_DNS_SECURE_NO_MULTIPLE_OUTSTANDING | LWIP_DNS_SECURE_RAND_SRC_PORT) -*/
@@ -103,6 +99,8 @@
 #define CHECKSUM_GEN_UDP 0
 /*----- Value in opt.h for CHECKSUM_GEN_TCP: 1 -----*/
 #define CHECKSUM_GEN_TCP 0
+/*----- Value in opt.h for CHECKSUM_GEN_ICMP: 1 -----*/
+#define CHECKSUM_GEN_ICMP 0
 /*----- Value in opt.h for CHECKSUM_GEN_ICMP6: 1 -----*/
 #define CHECKSUM_GEN_ICMP6 0
 /*----- Value in opt.h for CHECKSUM_CHECK_IP: 1 -----*/
@@ -111,6 +109,8 @@
 #define CHECKSUM_CHECK_UDP 0
 /*----- Value in opt.h for CHECKSUM_CHECK_TCP: 1 -----*/
 #define CHECKSUM_CHECK_TCP 0
+/*----- Value in opt.h for CHECKSUM_CHECK_ICMP: 1 -----*/
+#define CHECKSUM_CHECK_ICMP 0
 /*----- Value in opt.h for CHECKSUM_CHECK_ICMP6: 1 -----*/
 #define CHECKSUM_CHECK_ICMP6 0
 /*-----------------------------------------------------------------------------*/

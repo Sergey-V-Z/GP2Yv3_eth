@@ -110,7 +110,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_GPIO_WritePin(eth_NRST_GPIO_Port, eth_NRST_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

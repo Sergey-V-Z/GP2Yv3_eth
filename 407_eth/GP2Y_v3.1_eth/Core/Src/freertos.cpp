@@ -168,7 +168,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of MainTask */
-  osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 256);
+  osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 512);
   MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
   /* definition and creation of LED */
