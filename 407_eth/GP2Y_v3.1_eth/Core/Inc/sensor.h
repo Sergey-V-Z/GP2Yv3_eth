@@ -18,12 +18,13 @@ class sensor: public filter{
    void setOffsetMin(uint16_t offset);
    void setOffsetMax(uint16_t offset);
    void setTimeCall(uint32_t time);
+   void data_processing(uint16_t *data);
    uint16_t getOffsetMin();
    uint16_t getOffsetMax();
    bool detectPoll();
    uint16_t Get_Result();
    bool getdetect();
-   void Call(uint16_t *data); // калибрует датчик, принимает указатель на переменную в которую поступаю свежие данные
+   void Call(); // калибрует датчик, принимает указатель на переменную в которую поступаю свежие данные
    
    uint32_t timOut = 10;
    

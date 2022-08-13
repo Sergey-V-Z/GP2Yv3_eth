@@ -197,6 +197,10 @@ void mainTask(void const * argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN mainTask */
+
+	HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
+
 	mem_spi.Init(&hspi3, 0, ChipSelect, WriteProtect, Hold);
 
 	mem_spi.Read(&settings);
@@ -210,8 +214,8 @@ void mainTask(void const * argument)
 		mem_spi.Write(settings);
 	}
 
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 1);
-	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
+	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor1.setTimeCall(settings.timeCall);
 
 	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
@@ -221,8 +225,10 @@ void mainTask(void const * argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		osSemaphoreWait(ADC_endHandle, osWaitForever);
-		Sensor1.Filter_SMA(adc_buffer[0]);
+
+		//Sensor1.data_processing(adc_buffer);
+		//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
+
 		//Sensor2.Filter_SMA(adc_buffer[1]);
 		//Sensor3.Filter_SMA(adc_buffer[2]);
 		//printf("CH1: %d\r\n",Sensor1.Get_Result());
@@ -231,16 +237,27 @@ void mainTask(void const * argument)
 
 		if(call){
 			call = 0;
-			HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
-			Sensor1.Call(&adc_buffer[0]);
+			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
+			LED_IPadr.LEDon();
+			Sensor1.Call();
 			//Flash_Write(settings, StartSettingsAddres);
-			HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
-		}
-		if(Sensor1.detectPoll()){
-			HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
+			LED_IPadr.LEDoff();
+			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
 		}else{
-			HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+			osSemaphoreWait(ADC_endHandle, osWaitForever);
+			Sensor1.data_processing(adc_buffer);
+			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
+
+			if(Sensor1.detectPoll()){
+				LED_error.LEDon();
+				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
+			}else{
+				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+				LED_error.LEDoff();
+			}
 		}
+
+
 		//taskYIELD();
 	}
   /* USER CODE END mainTask */
@@ -260,11 +277,11 @@ void led(void const * argument)
 	LED_IPadr.Init(G_GPIO_Port, G_Pin);
 	LED_error.Init(R_GPIO_Port, R_Pin);
 	LED_OSstart.Init(B_GPIO_Port, B_Pin);
+
+	LED_IPadr.setParameters(mode::ON_OFF);
+	LED_error.setParameters(mode::ON_OFF);
 	LED_OSstart.setParameters(mode::BLINK, 2000, 100);
 	LED_OSstart.LEDon();
-
-	HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
 
 	//uint32_t tickcount = osKernelSysTick();// переменная для точной задержки
 	/* Infinite loop */
@@ -315,7 +332,7 @@ void eth_Task(void const * argument)
 {
   /* USER CODE BEGIN eth_Task */
 
-	LED_IPadr.setParameters(mode::ON_OFF);
+
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
 	LED_IPadr.LEDon();
 	osDelay(1000);
@@ -354,7 +371,7 @@ void eth_Task(void const * argument)
 					accept_err=netconn_accept(conn,&newconn);//suspend until new connection
 					if (accept_err==ERR_OK)
 					{
-						LED_IPadr.LEDon();
+						//LED_IPadr.LEDon();
 						while ((accept_err=netconn_recv(newconn,&netbuf))==ERR_OK)//работаем до тех пор пока клиент не разорвет соеденение
 						{
 
@@ -450,7 +467,7 @@ void eth_Task(void const * argument)
 								//Выполнение комманд
 								int count_cmd = arr_cmd.size();
 								for (int i = 0; i < count_cmd; ++i) {
-									uint32_t temp;
+
 									switch (arr_cmd[i].cmd) {
 									case 1: //
 										arr_cmd[i].data_out = (uint32_t)Sensor1.getdetect();
@@ -521,13 +538,13 @@ void eth_Task(void const * argument)
 								//Формируем ответ
 								string resp;
 								for (int i = 0; i < count_cmd; ++i) {
-									resp.append("C" + to_string(arr_cmd[i].cmd));
+									resp.append(f_cmd + to_string(arr_cmd[i].cmd));
 									if(arr_cmd[i].need_resp){
-										resp.append("D" + to_string(arr_cmd[i].cmd));
+										resp.append(f_datd + to_string(arr_cmd[i].cmd));
 									}else{
-										resp.append("D" + arr_cmd[i].err);
+										resp.append(f_datd + arr_cmd[i].err);
 									}
-									resp.append("x");
+									resp.append(delim);
 								}
 								netconn_write(newconn, resp.c_str(), resp.size(), NETCONN_COPY);
 
@@ -537,7 +554,7 @@ void eth_Task(void const * argument)
 						}
 						netconn_close(newconn);
 						netconn_delete(newconn);
-						LED_IPadr.LEDoff();
+						//LED_IPadr.LEDoff();
 					} else netconn_delete(newconn);
 					osDelay(20);
 				}
@@ -552,8 +569,10 @@ void eth_Task(void const * argument)
 /* USER CODE BEGIN Application */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	/* This is called after the conversion is completed */
-
-	osSemaphoreRelease(ADC_endHandle);
-
+	if(hadc->Instance == ADC1)
+	  {
+		HAL_ADC_Stop_DMA(&hadc1);
+		osSemaphoreRelease(ADC_endHandle);
+	  }
 }
 /* USER CODE END Application */

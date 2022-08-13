@@ -1,4 +1,8 @@
 #include "sensor.h"
+extern osSemaphoreId ADC_endHandle;
+extern ADC_HandleTypeDef hadc2;
+extern ADC_HandleTypeDef hadc1;
+extern uint16_t adc_buffer[1024];
 
 sensor :: sensor(){
    
@@ -6,6 +10,17 @@ sensor :: sensor(){
 
 sensor :: ~sensor(){
    
+}
+
+// обробатываем накопленные данные
+void sensor :: data_processing(uint16_t *data){
+
+	for (int var = 0; var < 16; ++var) {
+		Filter_SMA(*data); // обробатываем
+		*data = 0; // обнуляем
+		data++; // идем дальше
+	}
+
 }
 
 bool sensor :: detectPoll(){
@@ -30,14 +45,23 @@ bool sensor :: detectPoll(){
   return detect;
 }
 
-void sensor :: Call(uint16_t *data){
+void sensor :: Call(){
   peak = 0;
   gorge = 0;
-  for(int i = 0; i < timeCall; ++i)
+  uint32_t old_time = HAL_GetTick();
+
+  while(!(timeCall <= (HAL_GetTick() - old_time)))
   {
-     Filter_SMA(*data);
-     osDelay(1);
+	 osSemaphoreWait(ADC_endHandle, osWaitForever);
+	 uint16_t *data = adc_buffer;
+	 for (int var = 0; var < 16; ++var) {
+		 Filter_SMA(*data); // обробатываем
+		 *data = 0; // обнуляем
+		 data++; // идем дальше
+	 }
+	 HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
   }
+  uint32_t test_time = HAL_GetTick() - old_time;
    offsetMax = peak;
    offsetMin = gorge;
       
