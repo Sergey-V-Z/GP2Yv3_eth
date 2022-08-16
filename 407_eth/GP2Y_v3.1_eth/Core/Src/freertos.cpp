@@ -222,6 +222,9 @@ void mainTask(void const * argument)
 	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin, GPIO_PIN_SET);
 
+	HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+
 	/* Infinite loop */
 	for(;;)
 	{

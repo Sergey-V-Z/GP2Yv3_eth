@@ -1,0 +1,174 @@
+Removed Pin From Net: NetName=+5v Pin=DG2-1
+Removed Pin From Net: NetName=+5v Pin=DG3-1
+Change Component Comment : Designator=R6 Old Comment=0603 1.5K New Comment=0603 3K
+Change Component Comment : Designator=R7 Old Comment=0603 1.5K New Comment=0603 3K
+Change Component Comment : Designator=R9 Old Comment=0603 1.5K New Comment=0603 3K
+Change component parameters: Designator = "R6" ("R6"); Footprint = "Resistor 0603"; UniqueID = "\JGSANVYA" ("\JGSANVYA")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 3K"; VariantName = "[No Variations]"
+Change component parameters: Designator = "R7" ("R7"); Footprint = "Resistor 0603"; UniqueID = "\CYKGQJYG" ("\CYKGQJYG")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 3K"; VariantName = "[No Variations]"
+Change component parameters: Designator = "R9" ("R9"); Footprint = "Resistor 0603"; UniqueID = "\PQICZFUY" ("\PQICZFUY")
+Change component parameters (AddParameter): Name = "Value"; Value = "0603 3K"; VariantName = "[No Variations]"
+Added Component: Designator=Q1(SOT23)
+Add component (AddParameter): Name = "ComponentLink1Description"; Value = "Manufacturer Link"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "ComponentLink1URL"; Value = "http://www.zetex.com/"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "ComponentLink2Description"; Value = "Datasheet"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "ComponentLink2URL"; Value = "www.zetex.com/3.0/pdf/ZXM61P02F.pdf"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "DatasheetVersion"; Value = "Jul-99"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageDescription"; Value = "SOT-23; 3 Leads; Body 3.1 x 2.5 mm, inc. leads (LxW max), Alternate Lead Configuration"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageReference"; Value = "SOT23"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageVersion"; Value = "1996"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Published"; Value = "17-Dec-2003"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Added Component: Designator=Q2(SOT23)
+Add component (AddParameter): Name = "ComponentLink1Description"; Value = "Manufacturer Link"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "ComponentLink1URL"; Value = "http://www.zetex.com/"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "ComponentLink2Description"; Value = "Datasheet"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "ComponentLink2URL"; Value = "www.zetex.com/3.0/pdf/ZXM61P02F.pdf"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "DatasheetVersion"; Value = "Jul-99"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageDescription"; Value = "SOT-23; 3 Leads; Body 3.1 x 2.5 mm, inc. leads (LxW max), Alternate Lead Configuration"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageReference"; Value = "SOT23"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "PackageVersion"; Value = "1996"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Published"; Value = "17-Dec-2003"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Altium Limited"; VariantName = "[No Variations]"
+Added Component: Designator=R37(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 3K"; VariantName = "[No Variations]"
+Added Component: Designator=R38(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 3K"; VariantName = "[No Variations]"
+Added Component: Designator=R39(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 200"; VariantName = "[No Variations]"
+Added Component: Designator=R40(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 200"; VariantName = "[No Variations]"
+Added Component: Designator=R41(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 1.5K"; VariantName = "[No Variations]"
+Added Component: Designator=R42(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 1.5K"; VariantName = "[No Variations]"
+Added Component: Designator=R43(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 10K"; VariantName = "[No Variations]"
+Added Component: Designator=R44(RESCHIP0603)
+Add component (AddParameter): Name = "Body"; Value = "{Body}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Class"; Value = "Ёлектронные компоненты"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Installation"; Value = "{Installation}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Ordering_Information"; Value = "{Ordering_Information}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pins"; Value = "2"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Power_W"; Value = "{Power_W}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "SubClass"; Value = "–езисторы"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Tolerance_Percent"; Value = "{Tolerance_Percent}"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "0603 10K"; VariantName = "[No Variations]"
+Added Component: Designator=VT1(SOT23)
+Add component (AddParameter): Name = "Published"; Value = "17.04.2012"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Reukov A.V."; VariantName = "[No Variations]"
+Added Component: Designator=VT2(SOT23)
+Add component (AddParameter): Name = "Published"; Value = "17.04.2012"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Publisher"; Value = "Reukov A.V."; VariantName = "[No Variations]"
+Added Pin To Net: NetName=+5v Pin=Q1-3
+Added Pin To Net: NetName=+5v Pin=Q2-3
+Added Pin To Net: NetName=+5v Pin=R37-2
+Added Pin To Net: NetName=+5v Pin=R38-2
+Added Pin To Net: NetName=GND Pin=R43-1
+Added Pin To Net: NetName=GND Pin=R44-1
+Added Pin To Net: NetName=GND Pin=VT1-2
+Added Pin To Net: NetName=GND Pin=VT2-2
+Added Pin To Net: NetName=NetDG2_1 Pin=DG2-1
+Added Pin To Net: NetName=NetDG2_1 Pin=Q2-2
+Added Net: Name=NetDG2_1
+Added Pin To Net: NetName=NetDG3_1 Pin=DG3-1
+Added Pin To Net: NetName=NetDG3_1 Pin=Q1-2
+Added Net: Name=NetDG3_1
+Added Pin To Net: NetName=NetQ1_1 Pin=Q1-1
+Added Pin To Net: NetName=NetQ1_1 Pin=R37-1
+Added Pin To Net: NetName=NetQ1_1 Pin=R39-2
+Added Net: Name=NetQ1_1
+Added Pin To Net: NetName=NetQ2_1 Pin=Q2-1
+Added Pin To Net: NetName=NetQ2_1 Pin=R38-1
+Added Pin To Net: NetName=NetQ2_1 Pin=R40-2
+Added Net: Name=NetQ2_1
+Added Pin To Net: NetName=NetR39_1 Pin=R39-1
+Added Pin To Net: NetName=NetR39_1 Pin=VT1-3
+Added Net: Name=NetR39_1
+Added Pin To Net: NetName=NetR40_1 Pin=R40-1
+Added Pin To Net: NetName=NetR40_1 Pin=VT2-3
+Added Net: Name=NetR40_1
+Added Pin To Net: NetName=NetR41_2 Pin=R41-2
+Added Pin To Net: NetName=NetR41_2 Pin=R43-2
+Added Pin To Net: NetName=NetR41_2 Pin=VT1-1
+Added Net: Name=NetR41_2
+Added Pin To Net: NetName=NetR42_2 Pin=R42-2
+Added Pin To Net: NetName=NetR42_2 Pin=R44-2
+Added Pin To Net: NetName=NetR42_2 Pin=VT2-1
+Added Net: Name=NetR42_2
+Added Pin To Net: NetName=PWR1 Pin=R42-1
+Added Pin To Net: NetName=PWR1 Pin=U1-71
+Added Net: Name=PWR1
+Added Pin To Net: NetName=PWR2 Pin=R41-1
+Added Pin To Net: NetName=PWR2 Pin=U1-70
+Added Net: Name=PWR2
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component DG2 прижимной контакт
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component Q1 IRLML6402
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component Q2 IRLML6402
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R37 0603 3K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R38 0603 3K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R39 0603 200
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R40 0603 200
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R41 0603 1.5K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R42 0603 1.5K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R43 0603 10K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component R44 0603 10K
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component VT1 MMBT4401LT1
+Added Member To Class: ClassName=GP2Y_v3_eth Member=Component VT2 MMBT4401LT1
