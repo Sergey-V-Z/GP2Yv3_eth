@@ -73,7 +73,8 @@ uint8_t sensState = 255; // битовое поле
 uint32_t freqSens = HAL_RCC_GetHCLKFreq()/30000u;
 uint32_t pwmSens;
 
-uint16_t adc_buffer[1024] = {0};
+uint16_t adc_buffer[128] = {0};
+uint16_t adc_buffer2[128] = {0};
 sensor Sensor1;
 sensor Sensor2;
 sensor Sensor3;
@@ -105,7 +106,9 @@ uint32_t Start = 0;
 osThreadId MainTaskHandle;
 osThreadId LEDHandle;
 osThreadId ethTasHandle;
+osThreadId MainTask2Handle;
 osSemaphoreId ADC_endHandle;
+osSemaphoreId ADC_end2Handle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -115,6 +118,7 @@ osSemaphoreId ADC_endHandle;
 void mainTask(void const * argument);
 void led(void const * argument);
 void eth_Task(void const * argument);
+void mainTask2(void const * argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -154,6 +158,10 @@ void MX_FREERTOS_Init(void) {
   osSemaphoreDef(ADC_end);
   ADC_endHandle = osSemaphoreCreate(osSemaphore(ADC_end), 1);
 
+  /* definition and creation of ADC_end2 */
+  osSemaphoreDef(ADC_end2);
+  ADC_end2Handle = osSemaphoreCreate(osSemaphore(ADC_end2), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
 	/* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -178,6 +186,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of ethTas */
   osThreadDef(ethTas, eth_Task, osPriorityNormal, 0, 512);
   ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
+
+  /* definition and creation of MainTask2 */
+  osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 512);
+  MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
@@ -214,16 +226,13 @@ void mainTask(void const * argument)
 		mem_spi.Write(settings);
 	}
 
+	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor1.setTimeCall(settings.timeCall);
 
-	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin, GPIO_PIN_SET);
-
-	HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 
 	/* Infinite loop */
 	for(;;)
@@ -277,6 +286,10 @@ void led(void const * argument)
 {
   /* USER CODE BEGIN led */
 	/* Infinite loop */
+	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(B_GPIO_Port, B_Pin, GPIO_PIN_SET);
+
 	LED_IPadr.Init(G_GPIO_Port, G_Pin);
 	LED_error.Init(R_GPIO_Port, R_Pin);
 	LED_OSstart.Init(B_GPIO_Port, B_Pin);
@@ -480,56 +493,84 @@ void eth_Task(void const * argument)
 										arr_cmd[i].need_resp = true;*/
 										break;
 									case 2: //
+										arr_cmd[i].data_out = (uint32_t)Sensor2.getdetect();
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
+										break;
+									case 3:
+										Sensor1.pwr_set(arr_cmd[i].data_in);
+										arr_cmd[i].err = "OK";
+										break;
+									case 4:
+										Sensor2.pwr_set(arr_cmd[i].data_in);
+										arr_cmd[i].err = "OK";
+										break;
+									case 5: //
 										arr_cmd[i].data_out = (uint32_t)Sensor1.Get_Result();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
-
 										break;
-									case 3: //
+									case 6://
+										arr_cmd[i].data_out = (uint32_t)Sensor2.Get_Result();
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
+										break;
+									case 7://
 										arr_cmd[i].data_out = (uint32_t)Sensor1.Depth;
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
-									case 4://
+									case 8:
+										arr_cmd[i].data_out = (uint32_t)Sensor2.Depth;
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
+										break;
+									case 9:
 										Sensor1.Depth = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
-									case 5://
+									case 10:
+										Sensor2.Depth = arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
+										break;
+									case 11:
 										arr_cmd[i].data_out = (uint32_t)Sensor1.timOut;
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
-									case 6:
+									case 12:
+										arr_cmd[i].data_out = (uint32_t)Sensor2.timOut;
+										arr_cmd[i].need_resp = true;
+										arr_cmd[i].err = "OK";
+										break;
+									case 13:
 										Sensor1.timOut = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
-									case 7:
-							              Sensor1.setTimeCall(arr_cmd[i].data_in);
-							              settings.timeCall = arr_cmd[i].data_in;
+									case 14:
+										Sensor2.timOut = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
-									case 8:
-										mem_spi.Write(settings);
+									case 15:
+										Sensor1.setTimeCall(arr_cmd[i].data_in);
+										settings.timeCall = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
-									case 9:
+									case 16:
+										Sensor2.setTimeCall(arr_cmd[i].data_in);
+										settings.timeCall2 = arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
+										break;
+									case 17:
 										call = 1;
 										arr_cmd[i].err = "OK";
 										break;
-									case 10:
+									case 18:
 										arr_cmd[i].err = "no_CMD";
 										break;
-									case 11:
-										arr_cmd[i].err = "no_CMD";
-										break;
-									case 12:
-										arr_cmd[i].err = "no_CMD";
-										break;
-									case 13:
-										arr_cmd[i].err = "no_CMD";
-										break;
-									case 14:
-										arr_cmd[i].err = "no_CMD";
+									case 19:
+										mem_spi.Write(settings);
+										arr_cmd[i].err = "OK";
 										break;
 
 									default:
@@ -568,6 +609,50 @@ void eth_Task(void const * argument)
   /* USER CODE END eth_Task */
 }
 
+/* USER CODE BEGIN Header_mainTask2 */
+/**
+* @brief Function implementing the MainTask2 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_mainTask2 */
+void mainTask2(void const * argument)
+{
+  /* USER CODE BEGIN mainTask2 */
+	Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin);
+
+	HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
+	//HAL_TIM_Base_Start_IT(&htim3);
+	Sensor2.setTimeCall(settings.timeCall);
+
+  /* Infinite loop */
+  for(;;)
+  {
+		if(call){
+			call = 0;
+			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
+			LED_IPadr.LEDon();
+			Sensor2.Call();
+			//Flash_Write(settings, StartSettingsAddres);
+			LED_IPadr.LEDoff();
+			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
+		}else{
+			osSemaphoreWait(ADC_end2Handle, osWaitForever);
+			Sensor2.data_processing(adc_buffer2);
+			HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
+
+			if(Sensor2.detectPoll()){
+				LED_error.LEDon();
+				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
+			}else{
+				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+				LED_error.LEDoff();
+			}
+		}
+  }
+  /* USER CODE END mainTask2 */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
@@ -576,6 +661,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	  {
 		HAL_ADC_Stop_DMA(&hadc1);
 		osSemaphoreRelease(ADC_endHandle);
+	  }
+	if(hadc->Instance == ADC2)
+	  {
+		HAL_ADC_Stop_DMA(&hadc2);
+		osSemaphoreRelease(ADC_end2Handle);
 	  }
 }
 /* USER CODE END Application */

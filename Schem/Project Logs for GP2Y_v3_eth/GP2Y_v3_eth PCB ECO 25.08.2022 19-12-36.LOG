@@ -1,0 +1,8 @@
+Removed Pin From Net: NetName=NetDG3_1 Pin=Q1-2
+Removed Pin From Net: NetName=+5v Pin=Q1-3
+Removed Pin From Net: NetName=NetDG2_1 Pin=Q2-2
+Removed Pin From Net: NetName=+5v Pin=Q2-3
+Added Pin To Net: NetName=+5v Pin=Q1-2
+Added Pin To Net: NetName=NetDG3_1 Pin=Q1-3
+Added Pin To Net: NetName=+5v Pin=Q2-2
+Added Pin To Net: NetName=NetDG2_1 Pin=Q2-3
