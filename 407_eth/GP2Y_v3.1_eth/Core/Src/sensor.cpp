@@ -12,8 +12,13 @@ sensor :: ~sensor(){
    
 }
 void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr){
-
+	sensor :: ADC_endHandle = ADC_endHandle;
+	sensor :: hadc = hadc;
+	sensor :: adc_buffer = adc_buffer;
+	sensor :: GPIO_pwr = GPIO_pwr;
+	sensor :: Pin_pwr = Pin_pwr;
 }
+
 // обробатываем накопленные данные
 void sensor :: data_processing(uint16_t *data){
 

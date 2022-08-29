@@ -176,11 +176,11 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of MainTask */
-  osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 512);
+  osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 256);
   MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
   /* definition and creation of LED */
-  osThreadDef(LED, led, osPriorityNormal, 0, 256);
+  osThreadDef(LED, led, osPriorityNormal, 0, 128);
   LEDHandle = osThreadCreate(osThread(LED), NULL);
 
   /* definition and creation of ethTas */
@@ -188,7 +188,7 @@ void MX_FREERTOS_Init(void) {
   ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
 
   /* definition and creation of MainTask2 */
-  osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 512);
+  osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 256);
   MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -584,7 +584,7 @@ void eth_Task(void const * argument)
 								for (int i = 0; i < count_cmd; ++i) {
 									resp.append(f_cmd + to_string(arr_cmd[i].cmd));
 									if(arr_cmd[i].need_resp){
-										resp.append(f_datd + to_string(arr_cmd[i].cmd));
+										resp.append(f_datd + to_string(arr_cmd[i].data_out));
 									}else{
 										resp.append(f_datd + arr_cmd[i].err);
 									}
