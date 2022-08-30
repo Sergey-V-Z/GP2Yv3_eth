@@ -84,12 +84,7 @@ extern led LED_IPadr;
 extern led LED_error;
 extern led LED_OSstart;
 
-// for SPI Flash
-extern SPI_HandleTypeDef hspi3;
-pins_spi_t ChipSelect = {SPI3_CS_GPIO_Port, SPI3_CS_Pin};
-pins_spi_t WriteProtect = {WP_GPIO_Port, WP_Pin};
-pins_spi_t Hold = {HOLD_GPIO_Port, HOLD_Pin};
-flash mem_spi;
+
 
 //структуры для netcon
 extern struct netif gnetif;
@@ -99,8 +94,9 @@ string strIP;
 string in_str;
 
 //переменные для обшей работы
-bool resetSettings = false;
 uint32_t Start = 0;
+
+extern flash mem_spi;
 
 /* USER CODE END Variables */
 osThreadId MainTaskHandle;
@@ -209,22 +205,6 @@ void mainTask(void const * argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN mainTask */
-
-	HAL_GPIO_WritePin(HOLD_GPIO_Port, HOLD_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(WP_GPIO_Port, WP_Pin, GPIO_PIN_SET);
-
-	mem_spi.Init(&hspi3, 0, ChipSelect, WriteProtect, Hold);
-
-	mem_spi.Read(&settings);
-	if((settings.BaudRate == 0) | (settings.BaudRate == 0xFFFFFFFF) | resetSettings)
-	{
-		settings.BaudRate = 115200;
-		settings.SlaveAddress = 0x02;
-		settings.offsetMax = 0;
-		settings.offsetMin = 0;
-		settings.timeCall = 3000;
-		mem_spi.Write(settings);
-	}
 
 	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
@@ -623,7 +603,7 @@ void mainTask2(void const * argument)
 
 	HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
 	//HAL_TIM_Base_Start_IT(&htim3);
-	Sensor2.setTimeCall(settings.timeCall);
+	Sensor2.setTimeCall(settings.timeCall2);
 
   /* Infinite loop */
   for(;;)
@@ -642,11 +622,11 @@ void mainTask2(void const * argument)
 			HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
 
 			if(Sensor2.detectPoll()){
-				LED_error.LEDon();
+				LED_IPadr.LEDon();
 				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
 			}else{
 				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
-				LED_error.LEDoff();
+				LED_IPadr.LEDoff();
 			}
 		}
   }

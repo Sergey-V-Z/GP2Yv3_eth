@@ -40,6 +40,7 @@ typedef struct
 {
    uint32_t BaudRate;
    uint8_t  SlaveAddress;
+   uint8_t	MAC_end;
    uint16_t offsetMin;
    uint16_t offsetMax;
    uint32_t timeCall;

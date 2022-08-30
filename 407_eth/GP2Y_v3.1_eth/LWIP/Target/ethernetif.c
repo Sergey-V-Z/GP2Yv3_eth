@@ -166,7 +166,7 @@ void HAL_ETH_ErrorCallback(ETH_HandleTypeDef *handlerEth)
 }
 
 /* USER CODE BEGIN 4 */
-
+extern settings_t settings;
 /* USER CODE END 4 */
 
 /*******************************************************************************
@@ -202,7 +202,8 @@ static void low_level_init(struct netif *netif)
   heth.Init.RxBuffLen = 1536;
 
   /* USER CODE BEGIN MACADDRESS */
-  MACAddr[5] = 0x04;
+
+  MACAddr[5] = settings.MAC_end;
   /* USER CODE END MACADDRESS */
 
   hal_eth_init_status = HAL_ETH_Init(&heth);
