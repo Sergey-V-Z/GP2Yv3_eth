@@ -32,8 +32,8 @@ endFlag = "x"
 
 # комманды
 cmd1 = "17"
-cmd2 = "3"
-cmd3 = "4"
+cmd2 = "9"
+cmd3 = "10"
 cmd4 = "1"
 cmd5 = "2"
 cmd6 = "8"
@@ -44,8 +44,8 @@ cmd6 = "8"
 
 # данные для записи
 wdata1 = "0"
-wdata2 = "1"
-wdata3 = "1"
+wdata2 = "0"
+wdata3 = "0"
 wdata4 = "0"
 wdata5 = "0"
 wdata6 = "0"
@@ -86,38 +86,12 @@ data3 += addresFlag
 data3 += dataFlag
 data3 += wdata5
 data3 += endFlag
-'''
-start_time = time.time()
-tcp_socket.send(data.encode())
-#data = bytes.decode(data)
-data_r = tcp_socket.recv(1024)
-tcp_socket2.send(data.encode())
-data_r2 = tcp_socket2.recv(1024)
-#time.sleep(1)
-print('data:')
-print(time.time() - start_time)
-print(data_r)
-print(data_r2)
 
-time.sleep(5)
-'''
 start_time = time.time()
 tcp_socket.send(data2.encode())
 #data = bytes.decode(data)
-data_r3 = tcp_socket.recv(1024)
-tcp_socket2.send(data2.encode())
-data_r4 = tcp_socket2.recv(1024)
-#time.sleep(1)
-
-print(data_r3)
-print(data_r4)
-
-time.sleep(0.03)
-
-tcp_socket.send(data3.encode())
-#data = bytes.decode(data)
 data_r5 = tcp_socket.recv(1024)
-tcp_socket2.send(data3.encode())
+tcp_socket2.send(data2.encode())
 data_r6 = tcp_socket2.recv(1024)
 #time.sleep(1)
 print('data2:')
