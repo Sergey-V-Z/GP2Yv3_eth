@@ -55,6 +55,7 @@ bool sensor :: detectPoll(){
 void sensor :: Call(){
   peak = 0;
   gorge = 0;
+
   uint32_t old_time = HAL_GetTick();
 
   while(!(timeCall <= (HAL_GetTick() - old_time)))
@@ -71,7 +72,6 @@ void sensor :: Call(){
   //uint32_t test_time = HAL_GetTick() - old_time;
    offsetMax = peak;
    offsetMin = gorge;
-      
 }
 
 bool sensor :: getdetect(){

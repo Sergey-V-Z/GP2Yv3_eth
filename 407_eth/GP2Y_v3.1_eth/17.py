@@ -4,8 +4,8 @@ from socket import *
 import sys
 
 # Адрес центральной платы
-host = '192.168.0.8'
-host2 = '192.168.0.9'
+host = '192.168.0.10'
+host2 = '192.168.0.11'
 port = 81
 addr = (host, port)
 addr2 = (host2, port)

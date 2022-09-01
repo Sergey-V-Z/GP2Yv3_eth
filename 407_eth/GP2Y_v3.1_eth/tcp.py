@@ -4,8 +4,8 @@ from socket import *
 import sys
 
 # Адрес центральной платы
-host = '192.168.0.8'
-host2 = '192.168.0.9'
+host = '192.168.0.10'
+host2 = '192.168.0.11'
 port = 81
 addr = (host, port)
 addr2 = (host2, port)
@@ -86,21 +86,22 @@ data3 += addresFlag
 data3 += dataFlag
 data3 += wdata5
 data3 += endFlag
-'''
-start_time = time.time()
-tcp_socket.send(data.encode())
-#data = bytes.decode(data)
-data_r = tcp_socket.recv(1024)
-tcp_socket2.send(data.encode())
-data_r2 = tcp_socket2.recv(1024)
-#time.sleep(1)
-print('data:')
-print(time.time() - start_time)
-print(data_r)
-print(data_r2)
 
-time.sleep(5)
-'''
+if 0:
+    start_time = time.time()
+    tcp_socket.send(data.encode())
+    #data = bytes.decode(data)
+    data_r = tcp_socket.recv(1024)
+    tcp_socket2.send(data.encode())
+    data_r2 = tcp_socket2.recv(1024)
+    #time.sleep(1)
+    print('data:')
+    print(time.time() - start_time)
+    print(data_r)
+    print(data_r2)
+
+    time.sleep(5)
+
 start_time = time.time()
 tcp_socket.send(data2.encode())
 #data = bytes.decode(data)

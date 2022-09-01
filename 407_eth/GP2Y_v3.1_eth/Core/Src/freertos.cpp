@@ -77,8 +77,8 @@ uint16_t adc_buffer[128] = {0};
 uint16_t adc_buffer2[128] = {0};
 sensor Sensor1;
 sensor Sensor2;
-sensor Sensor3;
-uint16_t call = 0;
+//sensor Sensor3;
+uint16_t call = 0, call2 = 0;
 
 extern led LED_IPadr;
 extern led LED_error;
@@ -218,23 +218,16 @@ void mainTask(void const * argument)
 	for(;;)
 	{
 
-		//Sensor1.data_processing(adc_buffer);
-		//HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
-
-		//Sensor2.Filter_SMA(adc_buffer[1]);
-		//Sensor3.Filter_SMA(adc_buffer[2]);
-		//printf("CH1: %d\r\n",Sensor1.Get_Result());
-		//printf("CH2: %d\r\n",Sensor2.Get_Result());
-		//printf("CH3: %d\r\n",Sensor3.Get_Result());
-
 		if(call){
 			call = 0;
-			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
-			LED_IPadr.LEDon();
+			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
+			osDelay(300);
+
+			LED_error.LEDon();
 			Sensor1.Call();
-			//Flash_Write(settings, StartSettingsAddres);
-			LED_IPadr.LEDoff();
-			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
+			LED_error.LEDoff();
+
+			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET);
 		}else{
 			osSemaphoreWait(ADC_endHandle, osWaitForever);
 			Sensor1.data_processing(adc_buffer);
@@ -543,6 +536,7 @@ void eth_Task(void const * argument)
 										break;
 									case 17:
 										call = 1;
+										call2 = 1;
 										arr_cmd[i].err = "OK";
 										break;
 									case 18:
@@ -608,14 +602,17 @@ void mainTask2(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		if(call){
-			call = 0;
-			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_RESET);
+		if(call2){
+			call2 = 0;
+
+			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+			osDelay(300);
+
 			LED_IPadr.LEDon();
 			Sensor2.Call();
-			//Flash_Write(settings, StartSettingsAddres);
 			LED_IPadr.LEDoff();
-			//HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
+
+			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET);
 		}else{
 			osSemaphoreWait(ADC_end2Handle, osWaitForever);
 			Sensor2.data_processing(adc_buffer2);
@@ -623,9 +620,7 @@ void mainTask2(void const * argument)
 
 			if(Sensor2.detectPoll()){
 				LED_IPadr.LEDon();
-				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
 			}else{
-				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
 				LED_IPadr.LEDoff();
 			}
 		}
