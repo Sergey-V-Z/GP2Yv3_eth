@@ -70,11 +70,7 @@ void sensor :: Call(){
   {
 	 osSemaphoreWait(*ADC_endHandle, osWaitForever);
 	 uint16_t *data = adc_buffer;
-	 for (int var = 0; var < 16; ++var) {
-		 Filter_SMA(*data); // обробатываем
-		 *data = 0; // обнуляем
-		 data++; // идем дальше
-	 }
+	 data_processing(data);
 	 HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, 16);
   }
   //uint32_t test_time = HAL_GetTick() - old_time;
