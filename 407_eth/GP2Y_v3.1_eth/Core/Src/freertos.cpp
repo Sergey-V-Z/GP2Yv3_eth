@@ -34,6 +34,7 @@ using namespace std;
 #include "api.h"
 #include <iostream>
 #include <vector>
+#include "hcsr04_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,6 +66,7 @@ struct mesage_t{
 extern TIM_HandleTypeDef htim3;
 extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc1;
+extern TIM_HandleTypeDef htim4;
 
 extern settings_t settings;
 uint16_t sensBuff[8] = {0};
@@ -78,6 +80,8 @@ uint16_t adc_buffer2[128] = {0};
 sensor Sensor1;
 sensor Sensor2;
 //sensor Sensor3;
+extern HCSR04Driver hcsr04Driver;
+bool ultrasens = true;
 uint16_t call = 0, call2 = 0;
 
 extern led LED_IPadr;
@@ -598,32 +602,40 @@ void mainTask2(void const * argument)
 	HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor2.setTimeCall(settings.timeCall2);
+	hcsr04Driver.init(TIM4,TIM_CHANNEL_2, TIM_CHANNEL_1);
 
   /* Infinite loop */
   for(;;)
   {
-		if(call2){
-			call2 = 0;
 
-			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
-			osDelay(300);
+	  if(ultrasens){
+		  float distance = hcsr04Driver.getDistance();
 
-			LED_IPadr.LEDon();
-			Sensor2.Call();
-			LED_IPadr.LEDoff();
+		  osDelay(100);
+	  }else{
+		  if(call2){
+			  call2 = 0;
 
-			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET);
-		}else{
-			osSemaphoreWait(ADC_end2Handle, osWaitForever);
-			Sensor2.data_processing(adc_buffer2);
-			HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
+			  HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+			  osDelay(300);
 
-			if(Sensor2.detectPoll()){
-				LED_IPadr.LEDon();
-			}else{
-				LED_IPadr.LEDoff();
-			}
-		}
+			  LED_IPadr.LEDon();
+			  Sensor2.Call();
+			  LED_IPadr.LEDoff();
+
+			  HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET);
+		  }else{
+			  osSemaphoreWait(ADC_end2Handle, osWaitForever);
+			  Sensor2.data_processing(adc_buffer2);
+			  HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
+
+			  if(Sensor2.detectPoll()){
+				  LED_IPadr.LEDon();
+			  }else{
+				  LED_IPadr.LEDoff();
+			  }
+		  }
+	  }
   }
   /* USER CODE END mainTask2 */
 }
@@ -643,4 +655,13 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 		osSemaphoreRelease(ADC_end2Handle);
 	  }
 }
+
+void HAL_TIM_IC_CaptureCallback (TIM_HandleTypeDef *htim)
+{
+	if (htim->Instance == TIM4) {
+		hcsr04Driver._acknowledgeChannelCapture();
+	}
+
+}
+
 /* USER CODE END Application */

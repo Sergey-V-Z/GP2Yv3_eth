@@ -31,6 +31,7 @@
 #include "flash_spi.h"
 #include "Delay_us_DWT.h"
 #include "LED.h"
+#include "hcsr04_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,6 +52,7 @@
 
 /* USER CODE BEGIN PV */
 settings_t settings = {115200, 0x0E};
+HCSR04Driver hcsr04Driver;
 
 uint32_t count_tic = 0; //для замеров времени выполнения кода
 extern TIM_HandleTypeDef htim3;
@@ -223,6 +225,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+  if (htim->Instance == TIM4) {
+	  hcsr04Driver._acknowledgeTimerUpdate();
+  }
 
   /* USER CODE END Callback 1 */
 }

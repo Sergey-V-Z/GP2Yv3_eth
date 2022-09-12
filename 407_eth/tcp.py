@@ -4,8 +4,8 @@ from socket import *
 import sys
 
 # Адрес центральной платы
-host = '192.168.0.10'
-host2 = '192.168.0.11'
+host = '192.168.0.14'
+host2 = '192.168.0.1'
 port = 81
 addr = (host, port)
 addr2 = (host2, port)
@@ -87,7 +87,7 @@ data3 += dataFlag
 data3 += wdata5
 data3 += endFlag
 
-if 0:
+if 1:
     start_time = time.time()
     tcp_socket.send(data.encode())
     #data = bytes.decode(data)
