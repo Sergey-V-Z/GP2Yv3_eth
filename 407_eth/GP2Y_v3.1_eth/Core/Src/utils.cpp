@@ -69,6 +69,35 @@ uint32_t getTimerChannelValue(TIM_TypeDef* tim, uint32_t channel)
     return value;
 }
 
+IRQn_Type getIRQCode(TIM_TypeDef* tim, uint32_t interruptType)
+{
+    IRQn_Type irqCode;
+    if (tim == TIM1) {
+        if (interruptType == TIM_IT_UPDATE) {
+            irqCode = TIM1_UP_TIM10_IRQn;
+        } else if (interruptType == TIM_IT_CC1 || interruptType == TIM_IT_CC2 || interruptType == TIM_IT_CC3 || interruptType == TIM_IT_CC4) {
+            irqCode = TIM1_CC_IRQn;
+        }
+    } else if (tim == TIM2) {
+        irqCode = TIM2_IRQn;
+    } else if (tim == TIM3) {
+        irqCode = TIM3_IRQn;
+    } else if (tim == TIM4) {
+        irqCode = TIM4_IRQn;
+    } else if (tim == TIM6) {
+        irqCode = TIM6_DAC_IRQn;
+    } else if (tim == TIM7) {
+        irqCode = TIM7_IRQn;
+    } else if (tim == TIM8) {
+        if (interruptType == TIM_IT_UPDATE) {
+            irqCode = TIM8_UP_TIM13_IRQn;
+        } else if (interruptType == TIM_IT_CC1 || interruptType == TIM_IT_CC2 || interruptType == TIM_IT_CC3 || interruptType == TIM_IT_CC4) {
+            irqCode = TIM8_CC_IRQn;
+        }
+    }
+
+    return irqCode;
+}
 
 uint32_t getTimInterruptTypeCode(uint32_t channel)
 {

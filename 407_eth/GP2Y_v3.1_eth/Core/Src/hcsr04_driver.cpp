@@ -28,7 +28,7 @@ void HCSR04Driver::init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echo
     hTim.State = HAL_TIM_STATE_RESET;
 
     // calculate timer prescaler to make timer frequncy equals COUNTER_FREQUNCY
-    hTim.Init.Prescaler = HAL_RCC_GetHCLKFreq() / COUNTER_FREQUNCY - 1;
+    hTim.Init.Prescaler = (HAL_RCC_GetPCLK1Freq()*2) / COUNTER_FREQUNCY - 1;
 
     // calculate counter period
     hTim.Init.Period = COUNTER_FREQUNCY / PROBING_FREQUNCY - 1;
@@ -65,14 +65,14 @@ void HCSR04Driver::init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echo
     HAL_TIM_IC_ConfigChannel(&hTim, &sConfigCapture, echoChannel);
 
     // configure timer interruptions in the NVIC
-    /*
+
     IRQn_Type triggerIRQ = getIRQCode(hTim.Instance, TIM_IT_UPDATE);
     IRQn_Type captureIRQ = getIRQCode(hTim.Instance, getTimInterruptTypeCode(echoChannel));
     HAL_NVIC_SetPriority(triggerIRQ, INTERRUPT_PRIOIRY, INTERRUPT_SUBPRIOIRY);
     HAL_NVIC_EnableIRQ(triggerIRQ);
     HAL_NVIC_SetPriority(captureIRQ, INTERRUPT_PRIOIRY, INTERRUPT_SUBPRIOIRY);
     HAL_NVIC_EnableIRQ(captureIRQ);
-    */
+
 
     // start timer
     // enable update interrupt at the timer side

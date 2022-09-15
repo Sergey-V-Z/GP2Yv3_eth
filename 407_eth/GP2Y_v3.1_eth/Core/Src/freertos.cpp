@@ -602,13 +602,14 @@ void mainTask2(void const * argument)
 	HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor2.setTimeCall(settings.timeCall2);
-	hcsr04Driver.init(TIM4,TIM_CHANNEL_2, TIM_CHANNEL_1);
+	hcsr04Driver.init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2);
 
   /* Infinite loop */
   for(;;)
   {
 
 	  if(ultrasens){
+		  HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 		  float distance = hcsr04Driver.getDistance();
 
 		  osDelay(100);
