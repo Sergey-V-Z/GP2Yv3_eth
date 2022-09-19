@@ -82,6 +82,7 @@ sensor Sensor2;
 //sensor Sensor3;
 extern HCSR04Driver hcsr04Driver;
 bool ultrasens = true;
+float distance_ul = 0.0;
 uint16_t call = 0, call2 = 0;
 
 extern led LED_IPadr;
@@ -107,6 +108,7 @@ osThreadId MainTaskHandle;
 osThreadId LEDHandle;
 osThreadId ethTasHandle;
 osThreadId MainTask2Handle;
+osMutexId distanceMutexHandle;
 osSemaphoreId ADC_endHandle;
 osSemaphoreId ADC_end2Handle;
 
@@ -148,6 +150,10 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* definition and creation of distanceMutex */
+  osMutexDef(distanceMutex);
+  distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
@@ -543,10 +549,32 @@ void eth_Task(void const * argument)
 										call2 = 1;
 										arr_cmd[i].err = "OK";
 										break;
-									case 18:
+									case 18://включение в качестве второго сенсора ултразвук
+										ultrasens = (bool)arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
+										break;
+									case 19://данные от ултразвука
+										xSemaphoreTake(distanceMutexHandle, 100);
+										arr_cmd[i].data_out = distance_ul;
+										xSemaphoreGive(distanceMutexHandle);
+										arr_cmd[i].err = "OK";
+										break;
+									case 20://настрока частоты работы ултрозвука
 										arr_cmd[i].err = "no_CMD";
 										break;
-									case 19:
+									case 21:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 22:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 23:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 24:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 25:
 										mem_spi.Write(settings);
 										arr_cmd[i].err = "OK";
 										break;
@@ -610,7 +638,9 @@ void mainTask2(void const * argument)
 
 	  if(ultrasens){
 		  HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
-		  float distance = hcsr04Driver.getDistance();
+		  xSemaphoreTake(distanceMutexHandle, 100);
+		  distance_ul = hcsr04Driver.getDistance();
+		  xSemaphoreGive(distanceMutexHandle);
 
 		  osDelay(100);
 	  }else{
