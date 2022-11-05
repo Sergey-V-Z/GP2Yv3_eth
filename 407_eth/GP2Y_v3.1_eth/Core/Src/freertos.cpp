@@ -641,6 +641,7 @@ void mainTask2(void const * argument)
 		  HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 		  xSemaphoreTake(distanceMutexHandle, 100);
 		  distance_ul = hcsr04Driver.getDistance();
+		  if(distance_ul<0) distance_ul = 0;
 		  xSemaphoreGive(distanceMutexHandle);
 
 		  osDelay(100);
