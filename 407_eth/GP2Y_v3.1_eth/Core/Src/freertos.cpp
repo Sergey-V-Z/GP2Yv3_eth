@@ -43,11 +43,11 @@ struct mesage_t{
 	uint32_t cmd;
 	uint32_t addres_var;
 	uint32_t data_in;
-	bool need_resp;
+	bool need_resp = false;
 	bool data_in_is;
 	uint32_t data_out;
 	string err; // сообщение клиенту об ошибке в сообщении
-	bool f_bool; // наличие ошибки в сообшении
+	bool f_bool = false; // наличие ошибки в сообшении
 };
 /* USER CODE END PTD */
 
@@ -554,8 +554,9 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 19://данные от ултразвука
+										arr_cmd[i].need_resp = true;
 										xSemaphoreTake(distanceMutexHandle, 100);
-										arr_cmd[i].data_out = distance_ul;
+										arr_cmd[i].data_out = (uint32_t)(distance_ul*100); //переводим в сантиметры и сохранияем
 										xSemaphoreGive(distanceMutexHandle);
 										arr_cmd[i].err = "OK";
 										break;
