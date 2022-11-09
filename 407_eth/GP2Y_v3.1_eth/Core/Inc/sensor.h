@@ -29,7 +29,8 @@ class sensor: public filter{
    void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr);
    
    uint32_t timOut = 10;
-   
+   bool change_settings = false;
+
   private:
    uint16_t offsetMin = 0;              // зона работы датчика
    uint16_t offsetMax = 4096;           // зона работы датчика

@@ -81,7 +81,7 @@ sensor Sensor1;
 sensor Sensor2;
 //sensor Sensor3;
 extern HCSR04Driver hcsr04Driver;
-bool ultrasens = true;
+bool ultrasens = false;
 float distance_ul = 0.0;
 uint16_t call = 0, call2 = 0;
 
@@ -109,6 +109,8 @@ osThreadId LEDHandle;
 osThreadId ethTasHandle;
 osThreadId MainTask2Handle;
 osMutexId distanceMutexHandle;
+osMutexId Depth1Handle;
+osMutexId Depth2Handle;
 osSemaphoreId ADC_endHandle;
 osSemaphoreId ADC_end2Handle;
 
@@ -154,6 +156,14 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of distanceMutex */
   osMutexDef(distanceMutex);
   distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
+
+  /* definition and creation of Depth1 */
+  osMutexDef(Depth1);
+  Depth1Handle = osMutexCreate(osMutex(Depth1));
+
+  /* definition and creation of Depth2 */
+  osMutexDef(Depth2);
+  Depth2Handle = osMutexCreate(osMutex(Depth2));
 
   /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
@@ -241,7 +251,7 @@ void mainTask(void const * argument)
 		}else{
 			osSemaphoreWait(ADC_endHandle, osWaitForever);
 			Sensor1.data_processing(adc_buffer);
-			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
+			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 
 			if(Sensor1.detectPoll()){
 				LED_error.LEDon();
@@ -509,11 +519,15 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 9:
+										Sensor1.change_settings = true; // включение режима настроек
 										Sensor1.Depth = arr_cmd[i].data_in;
+										Sensor1.change_settings = false; // выключение режима настроек
 										arr_cmd[i].err = "OK";
 										break;
 									case 10:
+										Sensor2.change_settings = true; // включение режима настроек
 										Sensor2.Depth = arr_cmd[i].data_in;
+										Sensor2.change_settings = false; // выключение режима настроек
 										arr_cmd[i].err = "OK";
 										break;
 									case 11:
@@ -660,7 +674,7 @@ void mainTask2(void const * argument)
 		  }else{
 			  osSemaphoreWait(ADC_end2Handle, osWaitForever);
 			  Sensor2.data_processing(adc_buffer2);
-			  HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
+			  HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 
 			  if(Sensor2.detectPoll()){
 				  LED_IPadr.LEDon();

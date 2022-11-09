@@ -22,19 +22,21 @@ void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint1
 // обробатываем накопленные данные
 void sensor :: data_processing(uint16_t *data){
 
-	uint32_t Output = 0;
-	/* Sum */
-	for (int var = 0; var < 16; ++var) {
-		Output += *data;
-		*data = 0; // обнуляем
-		data++; // идем дальше
+	if(!change_settings){
+		uint32_t Output = 0;
+		/* Sum */
+		for (int var = 0; var < Depth; ++var) {
+			Output += *data;
+			*data = 0; // обнуляем
+			data++; // идем дальше
+		}
+
+		/* Divide */
+		Result = (uint16_t) (Output / Depth);
+
+		if(Result > peak){peak = Result;}
+		if(Result < gorge){gorge = Result;}
 	}
-
-	/* Divide */
-	Result = (uint16_t) (Output / Depth);
-
-	if(Result > peak){peak = Result;}
-	if(Result < gorge){gorge = Result;}
 
 }
 
