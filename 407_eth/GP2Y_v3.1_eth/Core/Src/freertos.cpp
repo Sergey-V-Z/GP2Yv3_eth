@@ -49,6 +49,12 @@ struct mesage_t{
 	string err; // сообщение клиенту об ошибке в сообщении
 	bool f_bool = false; // наличие ошибки в сообшении
 };
+
+struct debugSensor{
+	uint32_t time;
+	uint32_t dada[16];
+};
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -89,7 +95,9 @@ extern led LED_IPadr;
 extern led LED_error;
 extern led LED_OSstart;
 
-
+//переменные для отладки
+vector<debugSensor> debugBoof;
+uint32_t debug_I = 0;
 
 //структуры для netcon
 extern struct netif gnetif;
@@ -108,9 +116,8 @@ osThreadId MainTaskHandle;
 osThreadId LEDHandle;
 osThreadId ethTasHandle;
 osThreadId MainTask2Handle;
+osThreadId debug_udpHandle;
 osMutexId distanceMutexHandle;
-osMutexId Depth1Handle;
-osMutexId Depth2Handle;
 osSemaphoreId ADC_endHandle;
 osSemaphoreId ADC_end2Handle;
 
@@ -123,6 +130,7 @@ void mainTask(void const * argument);
 void led(void const * argument);
 void eth_Task(void const * argument);
 void mainTask2(void const * argument);
+void Debug_udp(void const * argument);
 
 extern void MX_LWIP_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -156,14 +164,6 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of distanceMutex */
   osMutexDef(distanceMutex);
   distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
-
-  /* definition and creation of Depth1 */
-  osMutexDef(Depth1);
-  Depth1Handle = osMutexCreate(osMutex(Depth1));
-
-  /* definition and creation of Depth2 */
-  osMutexDef(Depth2);
-  Depth2Handle = osMutexCreate(osMutex(Depth2));
 
   /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
@@ -207,6 +207,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 256);
   MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
 
+  /* definition and creation of debug_udp */
+  osThreadDef(debug_udp, Debug_udp, osPriorityNormal, 0, 512);
+  debug_udpHandle = osThreadCreate(osThread(debug_udp), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -227,13 +231,14 @@ void mainTask(void const * argument)
   /* USER CODE BEGIN mainTask */
 
 	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, 16);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor1.setTimeCall(settings.timeCall);
 
 	//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
 	//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 
+	debugSensor tempUnit;
 	/* Infinite loop */
 	for(;;)
 	{
@@ -251,6 +256,21 @@ void mainTask(void const * argument)
 		}else{
 			osSemaphoreWait(ADC_endHandle, osWaitForever);
 			Sensor1.data_processing(adc_buffer);
+
+			//start debug
+			if(debug_I <= 350){
+				debug_I++;
+				tempUnit.time = HAL_GetTick();
+				for (int var = 0; var < Sensor1.Depth; ++var) {
+					tempUnit.dada[var] = adc_buffer[var];
+				}
+				debugBoof.push_back(tempUnit);
+			}else{
+
+				while(debug_I){}
+			}
+			//end debug
+
 			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 
 			if(Sensor1.detectPoll()){
@@ -642,7 +662,7 @@ void mainTask2(void const * argument)
   /* USER CODE BEGIN mainTask2 */
 	Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin);
 
-	HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, 16);
+	HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor2.setTimeCall(settings.timeCall2);
 	hcsr04Driver.init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2);
@@ -685,6 +705,95 @@ void mainTask2(void const * argument)
 	  }
   }
   /* USER CODE END mainTask2 */
+}
+
+/* USER CODE BEGIN Header_Debug_udp */
+/**
+* @brief Function implementing the debug_udp thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Debug_udp */
+void Debug_udp(void const * argument)
+{
+  /* USER CODE BEGIN Debug_udp */
+	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
+		LED_IPadr.LEDon();
+		osDelay(1000);
+		LED_IPadr.LEDoff();
+		strIP = ip4addr_ntoa(&gnetif.ip_addr);
+
+		//структуры для netcon
+		struct netconn *conn;
+		struct netconn *newconn;
+		struct netbuf *netbuf;
+		volatile err_t err, accept_err;
+		//ip_addr_t local_ip;
+		//ip_addr_t remote_ip;
+		void 		*in_data = NULL;
+		uint16_t 		data_size = 0;
+
+		//Флаги для разбора сообщения
+		string f_cmd("C");
+		string f_addr("A");
+		string f_datd("D");
+		string delim("x");
+
+		/* Infinite loop */
+		for(;;)
+		{
+
+			conn = netconn_new(NETCONN_TCP);
+			if (conn!=NULL)
+			{
+				err = netconn_bind(conn,NULL,82);//assign port number to connection
+				if (err==ERR_OK)
+				{
+					netconn_listen(conn);//set port to listening mode
+					while(1)
+					{
+						accept_err=netconn_accept(conn,&newconn);//suspend until new connection
+						if (accept_err==ERR_OK)
+						{
+							//LED_IPadr.LEDon();
+							while ((accept_err=netconn_recv(newconn,&netbuf))==ERR_OK)//работаем до тех пор пока клиент не разорвет соеденение
+							{
+
+								do
+								{
+									netbuf_data(netbuf,&in_data,&data_size);//get pointer and data size of the buffer
+									in_str.assign((char*)in_data, data_size);//copy in string
+
+
+									//Формируем ответ
+									string resp;
+									/*
+									for (int i = 0; i < count_cmd; ++i) {
+										resp.append(f_cmd + to_string(arr_cmd[i].cmd));
+										if(arr_cmd[i].need_resp){
+											resp.append(f_datd + to_string(arr_cmd[i].data_out));
+										}else{
+											resp.append(f_datd + arr_cmd[i].err);
+										}
+										resp.append(delim);
+									}*/
+									netconn_write(newconn, resp.c_str(), resp.size(), NETCONN_COPY);
+
+								} while (netbuf_next(netbuf) >= 0);
+								netbuf_delete(netbuf);
+
+							}
+							netconn_close(newconn);
+							netconn_delete(newconn);
+							//LED_IPadr.LEDoff();
+						} else netconn_delete(newconn);
+						osDelay(20);
+					}
+				}
+			}
+			osDelay(1);
+  }
+  /* USER CODE END Debug_udp */
 }
 
 /* Private application code --------------------------------------------------*/
