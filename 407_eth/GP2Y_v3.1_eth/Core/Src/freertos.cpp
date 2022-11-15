@@ -52,7 +52,7 @@ struct mesage_t{
 
 struct debugSensor{
 	uint32_t time;
-	uint32_t dada[16];
+	uint16_t dada[16];
 };
 
 /* USER CODE END PTD */
@@ -96,8 +96,9 @@ extern led LED_error;
 extern led LED_OSstart;
 
 //переменные для отладки
-vector<debugSensor> debugBoof;
+vector<debugSensor> debugBuf;
 uint32_t debug_I = 0;
+bool debug_send = false;
 
 //структуры для netcon
 extern struct netif gnetif;
@@ -258,16 +259,19 @@ void mainTask(void const * argument)
 			Sensor1.data_processing(adc_buffer);
 
 			//start debug
-			if(debug_I <= 350){
+			if(debug_I <= 100){
 				debug_I++;
 				tempUnit.time = HAL_GetTick();
 				for (int var = 0; var < Sensor1.Depth; ++var) {
 					tempUnit.dada[var] = adc_buffer[var];
 				}
-				debugBoof.push_back(tempUnit);
+				debugBuf.push_back(tempUnit);
 			}else{
-
-				while(debug_I){}
+				if(debug_send){
+					debug_send = false;
+					debugBuf.clear();
+					debug_I = 0;
+				}
 			}
 			//end debug
 
@@ -322,21 +326,21 @@ void led(void const * argument)
 
 		if(Start == 1){
 			Start = 0;
-			//pMotor->stop();
+			Sensor1.pwr_set(2);
 		}
 		if(Start == 2){
 			Start = 0;
-			//pMotor->deceleration();
+			Sensor2.pwr_set(2);
 
 		}
 		if(Start == 3){
 			Start = 0;
-			//pMotor->start();
+			Sensor1.pwr_set(3);
 
 		}
 		if(Start == 4){
 			Start = 0;
-			//pMotor->SetDirection(dir::CW);
+			Sensor2.pwr_set(3);
 		}
 		if(Start == 5){
 			Start = 0;
@@ -718,9 +722,7 @@ void Debug_udp(void const * argument)
 {
   /* USER CODE BEGIN Debug_udp */
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
-		LED_IPadr.LEDon();
-		osDelay(1000);
-		LED_IPadr.LEDoff();
+
 		strIP = ip4addr_ntoa(&gnetif.ip_addr);
 
 		//структуры для netcon
@@ -732,12 +734,6 @@ void Debug_udp(void const * argument)
 		//ip_addr_t remote_ip;
 		void 		*in_data = NULL;
 		uint16_t 		data_size = 0;
-
-		//Флаги для разбора сообщения
-		string f_cmd("C");
-		string f_addr("A");
-		string f_datd("D");
-		string delim("x");
 
 		/* Infinite loop */
 		for(;;)
@@ -767,17 +763,24 @@ void Debug_udp(void const * argument)
 
 									//Формируем ответ
 									string resp;
-									/*
-									for (int i = 0; i < count_cmd; ++i) {
-										resp.append(f_cmd + to_string(arr_cmd[i].cmd));
-										if(arr_cmd[i].need_resp){
+
+									for (int i = 0; i < 100; ++i) {
+										resp.append("t"+to_string(debugBuf[i].time));
+										resp.append("d");
+										for (int var = 0; var < Sensor1.Depth; ++var) {
+											resp.append(","+to_string(debugBuf[i].dada[var]));
+										}
+
+										/*
+										 * if(arr_cmd[i].need_resp){
 											resp.append(f_datd + to_string(arr_cmd[i].data_out));
 										}else{
 											resp.append(f_datd + arr_cmd[i].err);
 										}
-										resp.append(delim);
-									}*/
-									netconn_write(newconn, resp.c_str(), resp.size(), NETCONN_COPY);
+										resp.append(delim);*/
+									}
+									netconn_write(newconn, resp.c_str(), resp.size(), NETCONN_NOCOPY);
+									debug_send = true;
 
 								} while (netbuf_next(netbuf) >= 0);
 								netbuf_delete(netbuf);
