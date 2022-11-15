@@ -256,9 +256,7 @@ void mainTask(void const * argument)
 			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET);
 		}else{
 			osSemaphoreWait(ADC_endHandle, osWaitForever);
-			Sensor1.data_processing(adc_buffer);
-
-			//start debug
+			/*//start debug
 			if(debug_I <= 100){
 				debug_I++;
 				tempUnit.time = HAL_GetTick();
@@ -273,8 +271,23 @@ void mainTask(void const * argument)
 					debug_I = 0;
 				}
 			}
-			//end debug
+			//end debug*/
+			Sensor1.data_processing(adc_buffer);
+			//start debug
+			if(debug_I <= 100){
+				debug_I++;
+				tempUnit.time = HAL_GetTick();
+				tempUnit.dada[0] = Sensor1.Get_Result();
 
+				debugBuf.push_back(tempUnit);
+			}else{
+				if(debug_send){
+					debug_send = false;
+					debugBuf.clear();
+					debug_I = 0;
+				}
+			}
+			//end debug
 			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 
 			if(Sensor1.detectPoll()){
@@ -765,19 +778,15 @@ void Debug_udp(void const * argument)
 									string resp;
 
 									for (int i = 0; i < 100; ++i) {
-										resp.append("t"+to_string(debugBuf[i].time));
-										resp.append("d");
-										for (int var = 0; var < Sensor1.Depth; ++var) {
-											resp.append(","+to_string(debugBuf[i].dada[var]));
-										}
 
+										resp.append(to_string(debugBuf[i].time) + ";");
+										resp.append(to_string(debugBuf[i].dada[0]) + "\n");
 										/*
-										 * if(arr_cmd[i].need_resp){
-											resp.append(f_datd + to_string(arr_cmd[i].data_out));
-										}else{
-											resp.append(f_datd + arr_cmd[i].err);
-										}
-										resp.append(delim);*/
+										for (int var = 0; var < Sensor1.Depth; ++var) {
+											resp.append(to_string(debugBuf[i].time) + ";");
+											resp.append(to_string(debugBuf[i].dada[var]) + "\n");
+										}*/
+
 									}
 									netconn_write(newconn, resp.c_str(), resp.size(), NETCONN_NOCOPY);
 									debug_send = true;
