@@ -1,5 +1,6 @@
 #include "filter_sma.h"
 #include "cmsis_os.h"
+#include "stdlib.h"
 
 //******************
 // CLASS: sensor
@@ -32,6 +33,8 @@ class sensor: public filter{
    bool change_settings = false;
 
   private:
+   float expRunningAvgAdaptive(float newVal);
+
    uint16_t offsetMin = 0;              // зона работы датчика
    uint16_t offsetMax = 4096;           // зона работы датчика
    uint32_t timeCall = 3000;            // время выполнение калибровки
