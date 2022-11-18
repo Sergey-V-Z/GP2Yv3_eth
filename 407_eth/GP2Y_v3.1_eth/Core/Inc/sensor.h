@@ -17,6 +17,7 @@ class sensor: public filter{
    sensor();
    ~sensor();
    void setOffsetMin(uint16_t offset);
+   void setOffset(uint16_t offset);
    void setOffsetMax(uint16_t offset);
    void setTimeCall(uint32_t time);
    void data_processing(uint16_t *data);
@@ -37,6 +38,7 @@ class sensor: public filter{
 
    uint16_t offsetMin = 0;              // зона работы датчика
    uint16_t offsetMax = 4096;           // зона работы датчика
+   uint16_t offset = 0;           		// смещение от ленты
    uint32_t timeCall = 3000;            // время выполнение калибровки
    bool detect;                         // в зоне сенсора что то есть
    uint16_t mode; 						// режим работы питания

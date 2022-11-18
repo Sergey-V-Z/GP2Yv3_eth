@@ -56,7 +56,7 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 bool sensor :: detectPoll(){
   
   //if((Result > offsetMin) && (Result < offsetMax)){
-  if(Result > offsetMax){
+  if(Result > (offsetMax + offset)){
     if(oldTime == 0){
       oldTime = HAL_GetTick();
     }
@@ -78,6 +78,7 @@ bool sensor :: detectPoll(){
 void sensor :: Call(){
   peak = 0;
   gorge = 0;
+  //добавить защиту при переходе времени через 0
 
   uint32_t old_time = HAL_GetTick();
 
@@ -89,8 +90,14 @@ void sensor :: Call(){
 	 HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, 16);
   }
   //uint32_t test_time = HAL_GetTick() - old_time;
-   offsetMax = peak;
-   offsetMin = gorge;
+  //старая модель
+  /*
+  offsetMax = peak;
+  offsetMin = gorge;
+  */
+  offsetMax = gorge;
+  offsetMin = peak;
+
 }
 
 bool sensor :: getdetect(){
@@ -104,7 +111,7 @@ void sensor :: pwr_set(uint16_t r){
 
 	switch (r) {
 		case 1:
-			mode = 1; // режим при котором питание отключается при чтрении
+			mode = 1; // режим при котором питание отключается при чтении
 			HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_SET);
 			break;
 		case 2:
@@ -121,15 +128,21 @@ void sensor :: pwr_set(uint16_t r){
 }
 
 uint16_t sensor :: Get_Result(){
+	//перенести выключение в pool  сделать его через флаг
 	if (mode == 1) {
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 	}
+
+	//защитить результат мютексом
    return Result;
 }
 void sensor :: setOffsetMin(uint16_t offset){
    offsetMin = offset;
 }
 
+void sensor :: setOffset(uint16_t offset){
+	sensor :: offset = offset;
+}
 void sensor :: setOffsetMax(uint16_t offset){
    offsetMax = offset;
 }
