@@ -33,10 +33,10 @@ void sensor :: data_processing(uint16_t *data){
 		}
 
 		/* Divide */
-		//Result = (uint16_t) (Output / Depth);
+		Result = (uint16_t) (Output);
 
-		if(Output > peak){peak = Output;}
-		if(Output < gorge){gorge = Output;}
+		if(Result > peak){peak = Result;}
+		if(Result < gorge){gorge = Result;}
 	}
 
 }
@@ -46,7 +46,7 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
   static float filVal = 0;
   float k;
   // резкость фильтра зависит от модуля разности значений
-  if (abs(newVal - filVal) > 1.5) k = 0.9;
+  if (abs(newVal - filVal) > 1.5) k = 0.5; // начальное 0.9
   else k = 0.03;
 
   filVal += (newVal - filVal) * k;

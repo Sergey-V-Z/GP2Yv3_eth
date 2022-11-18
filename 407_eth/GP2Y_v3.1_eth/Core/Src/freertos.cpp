@@ -53,6 +53,7 @@ struct mesage_t{
 struct debugSensor{
 	uint32_t time;
 	uint16_t dada[16];
+	bool detect = false;
 };
 
 /* USER CODE END PTD */
@@ -81,8 +82,8 @@ uint8_t sensState = 255; // битовое поле
 uint32_t freqSens = HAL_RCC_GetHCLKFreq()/30000u;
 uint32_t pwmSens;
 
-uint16_t adc_buffer[128] = {0};
-uint16_t adc_buffer2[128] = {0};
+uint16_t adc_buffer[24] = {0};
+uint16_t adc_buffer2[24] = {0};
 sensor Sensor1;
 sensor Sensor2;
 //sensor Sensor3;
@@ -278,7 +279,7 @@ void mainTask(void const * argument)
 				debug_I++;
 				tempUnit.time = HAL_GetTick();
 				tempUnit.dada[0] = Sensor1.Get_Result();
-
+				tempUnit.detect = Sensor1.getdetect();
 				debugBuf.push_back(tempUnit);
 			}else{
 				if(debug_send){
@@ -780,6 +781,7 @@ void Debug_udp(void const * argument)
 									for (int i = 0; i < 100; ++i) {
 
 										resp.append(to_string(debugBuf[i].time) + ";");
+										resp.append(to_string(debugBuf[i].detect) + ";");
 										resp.append(to_string(debugBuf[i].dada[0]) + "\n");
 										/*
 										for (int var = 0; var < Sensor1.Depth; ++var) {

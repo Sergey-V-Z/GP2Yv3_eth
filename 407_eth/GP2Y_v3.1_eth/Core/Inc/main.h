@@ -81,10 +81,10 @@ void Error_Handler(void);
 #define ECHO2_GPIO_Port GPIOD
 #define TRIG1_Pin GPIO_PIN_7
 #define TRIG1_GPIO_Port GPIOC
-#define pwr2_Pin GPIO_PIN_11
-#define pwr2_GPIO_Port GPIOA
-#define pwr1_Pin GPIO_PIN_12
+#define pwr1_Pin GPIO_PIN_11
 #define pwr1_GPIO_Port GPIOA
+#define pwr2_Pin GPIO_PIN_12
+#define pwr2_GPIO_Port GPIOA
 #define SPI3_CS_Pin GPIO_PIN_15
 #define SPI3_CS_GPIO_Port GPIOA
 #define WP_Pin GPIO_PIN_0
