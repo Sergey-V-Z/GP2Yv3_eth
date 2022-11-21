@@ -27,18 +27,16 @@ void sensor :: data_processing(uint16_t *data){
 		/* Sum */
 		for (int var = 0; var < Depth; ++var) {
 			//Output += *data;
-			Output = expRunningAvgAdaptive(*data);
-			*data = 0; // обнуляем
+			if((*data) >= 500){ //на входе фильтра отсекаем маленькие значенияя
+				Output = expRunningAvgAdaptive(*data); // фильтруем
+				*data = 0; // обнуляем входные данные
+			}
 			data++; // идем дальше
 		}
 
-		/* Divide */
+		/*  */
 		Result = (uint16_t) (Output);
-
-		if(Result > peak){peak = Result;}
-		if(Result < gorge){gorge = Result;}
 	}
-
 }
 
 // бегущее среднее с адаптивным коэффициентом
@@ -56,7 +54,7 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 bool sensor :: detectPoll(){
   
   //if((Result > offsetMin) && (Result < offsetMax)){
-  if(Result > (offsetMax + offset)){
+  if(Result > (offsetMin + offset)){
     if(oldTime == 0){
       oldTime = HAL_GetTick();
     }
@@ -77,26 +75,30 @@ bool sensor :: detectPoll(){
 
 void sensor :: Call(){
   peak = 0;
-  gorge = 0;
+  gorge = 10000;
   //добавить защиту при переходе времени через 0
 
   uint32_t old_time = HAL_GetTick();
 
-  while(!(timeCall <= (HAL_GetTick() - old_time)))
+  do
   {
-	 osSemaphoreWait(*ADC_endHandle, osWaitForever);
-	 uint16_t *data = adc_buffer;
-	 data_processing(data);
-	 HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, 16);
+	  osSemaphoreWait(*ADC_endHandle, osWaitForever);
+	  data_processing(adc_buffer); // оброботка данных
+	  HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, Depth);
+
+	  if((HAL_GetTick() - old_time) >= 500) // ждем стабилизации и начинаем писать данные
+	  {
+		  if(Result > 500){ //отсекаем маленькие дначения
+			  if(Result > peak){peak = Result;}
+			  if(Result < gorge){gorge = Result;}
+		  }
+	  }
   }
-  //uint32_t test_time = HAL_GetTick() - old_time;
-  //старая модель
-  /*
+  while(!(timeCall <= (HAL_GetTick() - old_time)));
+
   offsetMax = peak;
   offsetMin = gorge;
-  */
-  offsetMax = gorge;
-  offsetMin = peak;
+
 
 }
 

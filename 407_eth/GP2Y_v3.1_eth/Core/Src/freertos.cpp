@@ -237,6 +237,8 @@ void mainTask(void const * argument)
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor1.setTimeCall(settings.timeCall);
 
+	static uint32_t prevTime = HAL_GetTick();
+	static uint32_t GTime = 0;
 	//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
 	//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 
@@ -277,7 +279,8 @@ void mainTask(void const * argument)
 			//start debug
 			if(debug_I <= 100){
 				debug_I++;
-				tempUnit.time = HAL_GetTick();
+				tempUnit.time = GTime += ((HAL_GetTick()) - prevTime);
+				prevTime = HAL_GetTick();
 				tempUnit.dada[0] = Sensor1.Get_Result();
 				tempUnit.detect = Sensor1.getdetect();
 				debugBuf.push_back(tempUnit);
@@ -359,8 +362,19 @@ void led(void const * argument)
 		if(Start == 5){
 			Start = 0;
 			//pMotor->SetDirection(dir::CCW);
+			call = 1;
 		}
-
+		if(Start == 6){
+			Start = 0;
+			//pMotor->SetDirection(dir::CCW);
+			call2 = 1;
+		}
+		if(Start == 7){
+			Start = 0;
+			//pMotor->SetDirection(dir::CCW);
+			call = 1;
+			call2 = 1;
+		}
 		osDelay(1);
 		//taskYIELD();
 		//osDelayUntil(&tickcount, 1); // задача будет вызываься ровро через 1 милисекунду
