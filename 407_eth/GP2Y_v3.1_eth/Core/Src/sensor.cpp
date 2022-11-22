@@ -42,12 +42,12 @@ void sensor :: data_processing(uint16_t *data){
 // бегущее среднее с адаптивным коэффициентом
 float sensor :: expRunningAvgAdaptive(float newVal) {
   static float filVal = 0;
-  float k;
-  // резкость фильтра зависит от модуля разности значений
-  if (abs(newVal - filVal) > 1.5) k = 0.5; // начальное 0.9
-  else k = 0.03;
 
-  filVal += (newVal - filVal) * k;
+  // резкость фильтра зависит от модуля разности значений
+  if (abs(newVal - filVal) > 1.5) filVal += (newVal - filVal) *  k_H;
+  else filVal += (newVal - filVal) *  k_L;
+
+  //filVal += (newVal - filVal) * k;
   return filVal;
 }
 

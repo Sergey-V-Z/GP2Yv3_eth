@@ -42,6 +42,8 @@ class sensor: public filter{
    uint32_t timeCall = 3000;            // время выполнение калибровки
    bool detect;                         // в зоне сенсора что то есть
    uint16_t mode; 						// режим работы питания
+   float k_H = 0.1;						// коэфицент для быстрых изменений // начальное 0.9
+   float k_L= 0.03;						// коэфицент для медленных изменений
    
    osSemaphoreId *ADC_endHandle;
    ADC_HandleTypeDef *hadc;
