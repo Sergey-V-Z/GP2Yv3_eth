@@ -90,7 +90,7 @@ sensor Sensor2;
 extern HCSR04Driver hcsr04Driver;
 bool ultrasens = false;
 float distance_ul = 0.0;
-uint16_t call = 0, call2 = 0;
+uint16_t call1 = 0, call2 = 0;
 
 extern led LED_IPadr;
 extern led LED_error;
@@ -247,8 +247,8 @@ void mainTask(void const * argument)
 	for(;;)
 	{
 
-		if(call){
-			call = 0;
+		if(call1){
+			call1 = 0;
 			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
 			osDelay(300);
 
@@ -362,7 +362,7 @@ void led(void const * argument)
 		if(Start == 5){
 			Start = 0;
 			//pMotor->SetDirection(dir::CCW);
-			call = 1;
+			call1 = 1;
 		}
 		if(Start == 6){
 			Start = 0;
@@ -372,7 +372,7 @@ void led(void const * argument)
 		if(Start == 7){
 			Start = 0;
 			//pMotor->SetDirection(dir::CCW);
-			call = 1;
+			call1 = 1;
 			call2 = 1;
 		}
 		osDelay(1);
@@ -611,11 +611,11 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 17:
-										call = 1;
+										call1 = 1;
 										call2 = 1;
 										arr_cmd[i].err = "OK";
 										break;
-									case 18://включение в качестве второго сенсора ултразвук
+									case 18://включение в качестве первого сенсора ултразвук
 										ultrasens = (bool)arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
@@ -626,22 +626,53 @@ void eth_Task(void const * argument)
 										xSemaphoreGive(distanceMutexHandle);
 										arr_cmd[i].err = "OK";
 										break;
-									case 20://настрока частоты работы ултрозвука
+									case 20://включение в качестве второго сенсора ултразвук
 										arr_cmd[i].err = "no_CMD";
 										break;
-									case 21:
+									case 21://данные от ултразвука 2
 										arr_cmd[i].err = "no_CMD";
 										break;
-									case 22:
-										arr_cmd[i].err = "no_CMD";
+									case 22: // коллибровка S1
+										call1 = 1;
+										arr_cmd[i].err = "OK";
 										break;
-									case 23:
-										arr_cmd[i].err = "no_CMD";
+									case 23:// коллибровка S2
+										call2 = 1;
+										arr_cmd[i].err = "OK";
 										break;
 									case 24:
-										arr_cmd[i].err = "no_CMD";
+										Sensor1.setTrigger(arr_cmd[i].data_in);
+										arr_cmd[i].err = "OK";
 										break;
 									case 25:
+										Sensor2.setTrigger(arr_cmd[i].data_in);
+										arr_cmd[i].err = "OK";
+										break;
+									case 26:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 27:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 28:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 29:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 30:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 31:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 32:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 33:
+										arr_cmd[i].err = "no_CMD";
+										break;
+									case 34:
 										mem_spi.Write(settings);
 										arr_cmd[i].err = "OK";
 										break;

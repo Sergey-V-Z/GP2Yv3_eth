@@ -103,7 +103,7 @@ void sensor :: Call(){
 }
 
 bool sensor :: getdetect(){
-	if (mode == 1) {
+	if (modePwr == 1) {
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 	}
    return detect;
@@ -113,11 +113,11 @@ void sensor :: pwr_set(uint16_t r){
 
 	switch (r) {
 		case 1:
-			mode = 1; // режим при котором питание отключается при чтении
+			modePwr = 1; // режим при котором питание отключается при чтении
 			HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_SET);
 			break;
 		case 2:
-			mode = 2; // режим при котором питание отключается только принудительно
+			modePwr = 2; // режим при котором питание отключается только принудительно
 			HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_SET);
 			break;
 		case 3:
@@ -131,7 +131,7 @@ void sensor :: pwr_set(uint16_t r){
 
 uint16_t sensor :: Get_Result(){
 	//перенести выключение в pool  сделать его через флаг
-	if (mode == 1) {
+	if (modePwr == 1) {
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 	}
 
@@ -142,7 +142,7 @@ void sensor :: setOffsetMin(uint16_t offset){
    offsetMin = offset;
 }
 
-void sensor :: setOffset(uint16_t offset){
+void sensor :: setTrigger(uint16_t offset){
 	sensor :: triger = offset;
 }
 void sensor :: setOffsetMax(uint16_t offset){
