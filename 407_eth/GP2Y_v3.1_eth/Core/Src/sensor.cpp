@@ -54,7 +54,7 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 bool sensor :: detectPoll(){
   
   //if((Result > offsetMin) && (Result < offsetMax)){
-  if(Result > (offsetMin + offset)){
+  if(Result > (offsetMin + triger)){
     if(oldTime == 0){
       oldTime = HAL_GetTick();
     }
@@ -86,9 +86,9 @@ void sensor :: Call(){
 	  data_processing(adc_buffer); // оброботка данных
 	  HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, Depth);
 
-	  if((HAL_GetTick() - old_time) >= 500) // ждем стабилизации и начинаем писать данные
+	  if((HAL_GetTick() - old_time) >= 100) // ждем стабилизации и начинаем писать данные
 	  {
-		  if(Result > 500){ //отсекаем маленькие дначения
+		  if(Result > 500){ //отсекаем маленькие значения
 			  if(Result > peak){peak = Result;}
 			  if(Result < gorge){gorge = Result;}
 		  }
@@ -143,7 +143,7 @@ void sensor :: setOffsetMin(uint16_t offset){
 }
 
 void sensor :: setOffset(uint16_t offset){
-	sensor :: offset = offset;
+	sensor :: triger = offset;
 }
 void sensor :: setOffsetMax(uint16_t offset){
    offsetMax = offset;

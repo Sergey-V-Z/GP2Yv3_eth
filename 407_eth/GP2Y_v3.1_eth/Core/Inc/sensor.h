@@ -38,7 +38,7 @@ class sensor: public filter{
 
    uint16_t offsetMin = 0;              // зона работы датчика
    uint16_t offsetMax = 4096;           // зона работы датчика
-   uint16_t offset = 50;           		// смещение от ленты
+   uint16_t triger = 50;           		// смещение от ленты
    uint32_t timeCall = 3000;            // время выполнение калибровки
    bool detect;                         // в зоне сенсора что то есть
    uint16_t mode; 						// режим работы питания
