@@ -27,7 +27,7 @@ void sensor :: data_processing(uint16_t *data){
 		/* Sum */
 		for (int var = 0; var < Depth; ++var) {
 			//Output += *data;
-			if((*data) >= 500){ //на входе фильтра отсекаем маленькие значенияя
+			if((*data) >= 400){ //на входе фильтра отсекаем маленькие значенияя
 				Output = expRunningAvgAdaptive(*data); // фильтруем
 				*data = 0; // обнуляем входные данные
 			}
