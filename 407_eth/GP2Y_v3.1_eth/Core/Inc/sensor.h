@@ -30,7 +30,7 @@ class sensor: public filter{
    void pwr_set(uint16_t r);
    void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr);
    
-   uint32_t timOut = 400;
+   uint32_t timOut = 200;
    bool change_settings = false;
 
   private:
