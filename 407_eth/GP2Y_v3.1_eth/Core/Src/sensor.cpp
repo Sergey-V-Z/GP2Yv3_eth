@@ -86,7 +86,7 @@ void sensor :: Call(){
 	  data_processing(adc_buffer); // оброботка данных
 	  HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, Depth);
 
-	  if((HAL_GetTick() - old_time) >= 100) // ждем стабилизации и начинаем писать данные
+	  if((HAL_GetTick() - old_time) >= 10) // ждем стабилизации и начинаем писать данные
 	  {
 		  if(Result > 500){ //отсекаем маленькие значения
 			  if(Result > peak){peak = Result;}
