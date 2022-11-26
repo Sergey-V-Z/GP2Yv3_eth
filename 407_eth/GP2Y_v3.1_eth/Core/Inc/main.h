@@ -36,17 +36,26 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+enum SensorType{
+	Optic,
+	Ultrasens,
+	NoInit,
+};
+
 typedef struct
 {
-   uint32_t BaudRate;
-   uint8_t  SlaveAddress;
-   uint8_t	MAC_end;
-   uint16_t offsetMin;
-   uint16_t offsetMax;
-   uint32_t timeCall;
-   uint32_t timeCall2;
+	uint8_t sensorType1; // 1-Optic 2-ultrasens 3-Noinit
+	uint8_t sensorType2; // 1-Optic 2-ultrasens 3-Noinit
+	uint8_t  non_var;
+	uint8_t	MAC_end;
+	uint16_t triger1;
+	uint16_t triger2;
+	//uint16_t offsetMax;
+	uint32_t timeCall1;
+	uint32_t timeCall2;
 
 }settings_t;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

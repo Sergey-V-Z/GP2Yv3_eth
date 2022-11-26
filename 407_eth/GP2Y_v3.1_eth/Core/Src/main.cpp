@@ -31,7 +31,7 @@
 #include "flash_spi.h"
 #include "Delay_us_DWT.h"
 #include "LED.h"
-#include "hcsr04_driver.h"
+#include "sensor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,8 +51,11 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-settings_t settings = {115200, 0x0E};
-HCSR04Driver hcsr04Driver;
+settings_t settings = {0, 0x0E};
+//HCSR04Driver hcsr04Driver;
+sensor Sensor1;
+sensor Sensor2;
+SensorType sensorType = NoInit;
 
 uint32_t count_tic = 0; //для замеров времени выполнения кода
 extern TIM_HandleTypeDef htim3;
@@ -128,14 +131,16 @@ int main(void)
   mem_spi.Init(&hspi3, 0, ChipSelect, WriteProtect, Hold);
 
   mem_spi.Read(&settings);
-  if((settings.BaudRate == 0) | (settings.BaudRate == 0xFFFFFFFF) | resetSettings)
+
+  if((settings.sensorType2 == 0) | (settings.sensorType2 == 0xFFFFFFFF) | resetSettings)
   {
-	  settings.BaudRate = 115200;
-	  settings.SlaveAddress = 0x02;
+	  settings.sensorType1 = 3;
+	  settings.sensorType2 = 3;
 	  settings.MAC_end = 0x05;
-	  settings.offsetMax = 0;
-	  settings.offsetMin = 0;
-	  settings.timeCall = 3000;
+	  settings.triger1 = 50;
+	  settings.triger2 = 50;
+	  //settings.offsetMax = 0;
+	  settings.timeCall1 = 3000;
 	  settings.timeCall2 = 3000;
 	  mem_spi.Write(settings);
   }
@@ -226,7 +231,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM4) {
-	  hcsr04Driver._acknowledgeTimerUpdate();
+	  Sensor2._acknowledgeTimerUpdate();
   }
 
   /* USER CODE END Callback 1 */
