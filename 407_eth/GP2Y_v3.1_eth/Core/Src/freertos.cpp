@@ -154,68 +154,68 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
 void MX_FREERTOS_Init(void) {
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-	/* USER CODE END Init */
-	/* Create the mutex(es) */
-	/* definition and creation of distanceMutex */
-	osMutexDef(distanceMutex);
-	distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
+  /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* definition and creation of distanceMutex */
+  osMutexDef(distanceMutex);
+  distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
 
-	/* USER CODE BEGIN RTOS_MUTEX */
+  /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
-	/* USER CODE END RTOS_MUTEX */
+  /* USER CODE END RTOS_MUTEX */
 
-	/* Create the semaphores(s) */
-	/* definition and creation of ADC_end */
-	osSemaphoreDef(ADC_end);
-	ADC_endHandle = osSemaphoreCreate(osSemaphore(ADC_end), 1);
+  /* Create the semaphores(s) */
+  /* definition and creation of ADC_end */
+  osSemaphoreDef(ADC_end);
+  ADC_endHandle = osSemaphoreCreate(osSemaphore(ADC_end), 1);
 
-	/* definition and creation of ADC_end2 */
-	osSemaphoreDef(ADC_end2);
-	ADC_end2Handle = osSemaphoreCreate(osSemaphore(ADC_end2), 1);
+  /* definition and creation of ADC_end2 */
+  osSemaphoreDef(ADC_end2);
+  ADC_end2Handle = osSemaphoreCreate(osSemaphore(ADC_end2), 1);
 
-	/* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
 	/* add semaphores, ... */
-	/* USER CODE END RTOS_SEMAPHORES */
+  /* USER CODE END RTOS_SEMAPHORES */
 
-	/* USER CODE BEGIN RTOS_TIMERS */
+  /* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
-	/* USER CODE END RTOS_TIMERS */
+  /* USER CODE END RTOS_TIMERS */
 
-	/* USER CODE BEGIN RTOS_QUEUES */
+  /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
-	/* USER CODE END RTOS_QUEUES */
+  /* USER CODE END RTOS_QUEUES */
 
-	/* Create the thread(s) */
-	/* definition and creation of MainTask */
-	osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 256);
-	MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
+  /* Create the thread(s) */
+  /* definition and creation of MainTask */
+  osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 256);
+  MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
-	/* definition and creation of LED */
-	osThreadDef(LED, led, osPriorityNormal, 0, 128);
-	LEDHandle = osThreadCreate(osThread(LED), NULL);
+  /* definition and creation of LED */
+  osThreadDef(LED, led, osPriorityNormal, 0, 128);
+  LEDHandle = osThreadCreate(osThread(LED), NULL);
 
-	/* definition and creation of ethTas */
-	osThreadDef(ethTas, eth_Task, osPriorityNormal, 0, 512);
-	ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
+  /* definition and creation of ethTas */
+  osThreadDef(ethTas, eth_Task, osPriorityNormal, 0, 512);
+  ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
 
-	/* definition and creation of MainTask2 */
-	osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 256);
-	MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
+  /* definition and creation of MainTask2 */
+  osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 256);
+  MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
 
-	/* definition and creation of debug_udp */
-	osThreadDef(debug_udp, Debug_udp, osPriorityNormal, 0, 512);
-	debug_udpHandle = osThreadCreate(osThread(debug_udp), NULL);
+  /* definition and creation of debug_udp */
+  osThreadDef(debug_udp, Debug_udp, osPriorityNormal, 0, 512);
+  debug_udpHandle = osThreadCreate(osThread(debug_udp), NULL);
 
-	/* USER CODE BEGIN RTOS_THREADS */
+  /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-	/* USER CODE END RTOS_THREADS */
+  /* USER CODE END RTOS_THREADS */
 
 }
 
@@ -228,9 +228,9 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_mainTask */
 void mainTask(void const * argument)
 {
-	/* init code for LWIP */
-	MX_LWIP_Init();
-	/* USER CODE BEGIN mainTask */
+  /* init code for LWIP */
+  MX_LWIP_Init();
+  /* USER CODE BEGIN mainTask */
 
 	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
@@ -274,7 +274,7 @@ void mainTask(void const * argument)
 
 		//taskYIELD();
 	}
-	/* USER CODE END mainTask */
+  /* USER CODE END mainTask */
 }
 
 /* USER CODE BEGIN Header_led */
@@ -286,7 +286,7 @@ void mainTask(void const * argument)
 /* USER CODE END Header_led */
 void led(void const * argument)
 {
-	/* USER CODE BEGIN led */
+  /* USER CODE BEGIN led */
 	/* Infinite loop */
 	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
@@ -347,7 +347,7 @@ void led(void const * argument)
 		//taskYIELD();
 		//osDelayUntil(&tickcount, 1); // задача будет вызываься ровро через 1 милисекунду
 	}
-	/* USER CODE END led */
+  /* USER CODE END led */
 }
 
 /* USER CODE BEGIN Header_eth_Task */
@@ -359,7 +359,7 @@ void led(void const * argument)
 /* USER CODE END Header_eth_Task */
 void eth_Task(void const * argument)
 {
-	/* USER CODE BEGIN eth_Task */
+  /* USER CODE BEGIN eth_Task */
 
 
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
@@ -678,7 +678,7 @@ void eth_Task(void const * argument)
 		}
 		osDelay(1);
 	}
-	/* USER CODE END eth_Task */
+  /* USER CODE END eth_Task */
 }
 
 /* USER CODE BEGIN Header_mainTask2 */
@@ -690,7 +690,7 @@ void eth_Task(void const * argument)
 /* USER CODE END Header_mainTask2 */
 void mainTask2(void const * argument)
 {
-	/* USER CODE BEGIN mainTask2 */
+  /* USER CODE BEGIN mainTask2 */
 	switch (settings.sensorType2) {
 	case 1: // оптика
 		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin); // добавить настройки для ультразвука
@@ -755,7 +755,7 @@ void mainTask2(void const * argument)
 
 		}
 	}
-	/* USER CODE END mainTask2 */
+  /* USER CODE END mainTask2 */
 }
 
 /* USER CODE BEGIN Header_Debug_udp */
