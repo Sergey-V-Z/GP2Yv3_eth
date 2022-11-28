@@ -29,8 +29,7 @@ class sensor{
    bool getdetect();
    void Call(); // калибрует датчик, принимает указатель на переменную в которую поступаю свежие данные
    void pwr_set(uint16_t r);
-   void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, float soundSpeed = 343.0f);
-   void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr);
+   void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed = 343.0f);
    void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID);
    
    uint32_t timOut = 200;
@@ -85,8 +84,10 @@ class sensor{
    GPIO_TypeDef* GPIO_pwr;
    uint16_t Pin_pwr;
 
-   uint32_t oldTime = 0;
-   uint32_t time = 0;
+   uint32_t oldTimeRising = 0;
+   uint32_t timeRising = 0;
+   uint32_t oldTimeFalling = 0;
+   uint32_t timeFalling = 0;
    SensorType sensorType = NoInit;
 
    //for hcsr04

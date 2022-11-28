@@ -5,8 +5,9 @@
 //extern ADC_HandleTypeDef hadc1;
 //extern uint16_t adc_buffer[1024];
 
-void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr)
+void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID)
 {
+	id = ID;
 	if(sensorType == NoInit){
 		sensorType = Optic;
 
@@ -20,8 +21,9 @@ void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint1
 	}
 }
 
-void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, float soundSpeed)
+void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed)
 {
+	id = ID;
 	if(sensorType == NoInit){
 		sensorType = Ultrasound;
 
@@ -112,14 +114,6 @@ void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChan
 	}
 
 }
-void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID){
-	sensor :: ADC_endHandle = ADC_endHandle;
-	sensor :: hadc = hadc;
-	sensor :: adc_buffer = adc_buffer;
-	sensor :: GPIO_pwr = GPIO_pwr;
-	sensor :: Pin_pwr = Pin_pwr;
-	id = ID;
-}
 
 // обробатываем накопленные данные
 void sensor :: data_processing(uint16_t *data){
@@ -156,35 +150,37 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 }
 
 bool sensor :: detectPoll(){
-  
-  //if((Result > offsetMin) && (Result < offsetMax)){
-  if(Result > (offsetMin + triger)){
-	  if(this->id == 1){
-		  __NOP();
-	  }
-    if(oldTime == 0){
-      oldTime = HAL_GetTick();
-    }
-    
-    time = HAL_GetTick() - oldTime; 
-    
-    if(time >= timOut){
-  	  if(this->id == 1){
-  		  __NOP();
-  	  }
-      detect = true;
-      oldTime = 0;
 
-    }
-  }
-  else{
-	  if(this->id == 1){
-		  __NOP();
-	  }
-    detect = false;
-    oldTime = 0;
-  }
-  return detect;
+	//if((Result > offsetMin) && (Result < offsetMax)){
+	if(Result > (offsetMin + triger)){
+
+		if(this->id == 1){
+			__NOP();
+		}
+
+		if(oldTimeUP == 0){
+			oldTimeUP = HAL_GetTick();
+		}
+
+		timeUP = HAL_GetTick() - oldTimeUP;
+
+		if(timeUP >= timOut){
+			if(this->id == 1){
+				__NOP();
+			}
+			detect = true;
+			oldTimeUP = 0;
+
+		}
+	}
+	else{
+		if(this->id == 1){
+			__NOP();
+		}
+		detect = false;
+		oldTimeUP = 0;
+	}
+	return detect;
 }
 
 void sensor :: Call(){

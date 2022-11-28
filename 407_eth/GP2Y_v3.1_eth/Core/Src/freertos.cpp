@@ -693,12 +693,12 @@ void mainTask2(void const * argument)
   /* USER CODE BEGIN mainTask2 */
 	switch (settings.sensorType2) {
 	case 1: // оптика
-		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin); // добавить настройки для ультразвука
+		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2); // добавить настройки для ультразвука
 		HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 		Sensor2.setTimeCall(settings.timeCall2);
 		break;
 	case 2: // ултразвук
-		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2);
+		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
 
 		break;
 	default:
