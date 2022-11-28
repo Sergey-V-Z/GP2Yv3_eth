@@ -1,3 +1,4 @@
+#include "main.h"
 #include "cmsis_os.h"
 #include "stdlib.h"
 #include "main.h"
@@ -30,13 +31,11 @@ class sensor{
    void pwr_set(uint16_t r);
    void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, float soundSpeed = 343.0f);
    void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr);
+   void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID);
    
    uint32_t timOut = 200;
    bool change_settings = false;
    uint16_t Depth = 10;
-   uint16_t Result = 0;
-   float gorge = 0;                  // минимальное значение
-   float peak = 0;                   // пиковое значение
 
    //for hcsr04
 
@@ -74,6 +73,11 @@ class sensor{
    uint16_t modePwr; 						// режим работы питания
    float k_H = 0.1;						// коэфицент для быстрых изменений // начальное 0.9
    float k_L= 0.03;						// коэфицент для медленных изменений
+   uint16_t Result = 0;
+   float gorge = 0;                  // минимальное значение
+   float peak = 0;                   // пиковое значение
+   int id = 0;
+
    
    osSemaphoreId *ADC_endHandle;
    ADC_HandleTypeDef *hadc;

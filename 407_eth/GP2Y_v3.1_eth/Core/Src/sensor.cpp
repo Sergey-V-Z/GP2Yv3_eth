@@ -112,6 +112,14 @@ void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChan
 	}
 
 }
+void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID){
+	sensor :: ADC_endHandle = ADC_endHandle;
+	sensor :: hadc = hadc;
+	sensor :: adc_buffer = adc_buffer;
+	sensor :: GPIO_pwr = GPIO_pwr;
+	sensor :: Pin_pwr = Pin_pwr;
+	id = ID;
+}
 
 // обробатываем накопленные данные
 void sensor :: data_processing(uint16_t *data){
@@ -148,25 +156,35 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 }
 
 bool sensor :: detectPoll(){
+  
+  //if((Result > offsetMin) && (Result < offsetMax)){
+  if(Result > (offsetMin + triger)){
+	  if(this->id == 1){
+		  __NOP();
+	  }
+    if(oldTime == 0){
+      oldTime = HAL_GetTick();
+    }
+    
+    time = HAL_GetTick() - oldTime; 
+    
+    if(time >= timOut){
+  	  if(this->id == 1){
+  		  __NOP();
+  	  }
+      detect = true;
+      oldTime = 0;
 
-	//if((Result > offsetMin) && (Result < offsetMax)){
-	if(Result > (offsetMin + triger)){
-		if(oldTime == 0){
-			oldTime = HAL_GetTick();
-		}
-
-		time = HAL_GetTick() - oldTime;
-
-		if(time >= timOut){
-			detect = true;
-			oldTime = 0;
-		}
-	}
-	else{
-		detect = false;
-		oldTime = 0;
-	}
-	return detect;
+    }
+  }
+  else{
+	  if(this->id == 1){
+		  __NOP();
+	  }
+    detect = false;
+    oldTime = 0;
+  }
+  return detect;
 }
 
 void sensor :: Call(){

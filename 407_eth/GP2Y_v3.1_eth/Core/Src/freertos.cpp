@@ -232,13 +232,13 @@ void mainTask(void const * argument)
 	MX_LWIP_Init();
 	/* USER CODE BEGIN mainTask */
 
-	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin); // инициализируем оптический сенсор
+	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 	//HAL_TIM_Base_Start_IT(&htim3);
 	Sensor1.setTimeCall(settings.timeCall1);
 
-	static uint32_t prevTime = HAL_GetTick();
-	static uint32_t GTime = 0;
+	//static uint32_t prevTime = HAL_GetTick();
+	//static uint32_t GTime = 0;
 	//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
 	//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 
@@ -259,39 +259,7 @@ void mainTask(void const * argument)
 			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET);
 		}else{
 			osSemaphoreWait(ADC_endHandle, osWaitForever);
-			/*//start debug
-			if(debug_I <= 100){
-				debug_I++;
-				tempUnit.time = HAL_GetTick();
-				for (int var = 0; var < Sensor1.Depth; ++var) {
-					tempUnit.dada[var] = adc_buffer[var];
-				}
-				debugBuf.push_back(tempUnit);
-			}else{
-				if(debug_send){
-					debug_send = false;
-					debugBuf.clear();
-					debug_I = 0;
-				}
-			}
-			//end debug*/
 			Sensor1.data_processing(adc_buffer);
-			//start debug
-			if(debug_I <= 100){
-				debug_I++;
-				tempUnit.time = GTime += ((HAL_GetTick()) - prevTime);
-				prevTime = HAL_GetTick();
-				tempUnit.dada[0] = Sensor1.Get_Result();
-				tempUnit.detect = Sensor1.getdetect();
-				debugBuf.push_back(tempUnit);
-			}else{
-				if(debug_send){
-					debug_send = false;
-					debugBuf.clear();
-					debug_I = 0;
-				}
-			}
-			//end debug
 			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 
 			if(Sensor1.detectPoll()){
@@ -799,30 +767,28 @@ void mainTask2(void const * argument)
 /* USER CODE END Header_Debug_udp */
 void Debug_udp(void const * argument)
 {
-	/* USER CODE BEGIN Debug_udp */
+  /* USER CODE BEGIN Debug_udp */
+/*
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
 
 	strIP = ip4addr_ntoa(&gnetif.ip_addr);
 
-	//структуры для netcon
-	struct netconn *conn;
-	struct netconn *newconn;
-	struct netbuf *netbuf;
-	volatile err_t err, accept_err;
-	//ip_addr_t local_ip;
-	//ip_addr_t remote_ip;
-	void 		*in_data = NULL;
-	uint16_t 		data_size = 0;
-
-	/* Infinite loop */
-	for(;;)
-	{
-
-		conn = netconn_new(NETCONN_TCP);
-		if (conn!=NULL)
+		//структуры для netcon
+		struct netconn *conn;
+		struct netconn *newconn;
+		struct netbuf *netbuf;
+		volatile err_t err, accept_err;
+		//ip_addr_t local_ip;
+		//ip_addr_t remote_ip;
+		void 		*in_data = NULL;
+		uint16_t 		data_size = 0;
+*/
+		/* Infinite loop */
+		for(;;)
 		{
-			err = netconn_bind(conn,NULL,82);//assign port number to connection
-			if (err==ERR_OK)
+/*
+			conn = netconn_new(NETCONN_TCP);
+			if (conn!=NULL)
 			{
 				netconn_listen(conn);//set port to listening mode
 				while(1)
@@ -845,14 +811,11 @@ void Debug_udp(void const * argument)
 
 								for (int i = 0; i < 100; ++i) {
 
-									resp.append(to_string(debugBuf[i].time) + ";");
-									resp.append(to_string(debugBuf[i].detect) + ";");
-									resp.append(to_string(debugBuf[i].dada[0]) + "\n");
-									/*
-										for (int var = 0; var < Sensor1.Depth; ++var) {
-											resp.append(to_string(debugBuf[i].time) + ";");
-											resp.append(to_string(debugBuf[i].dada[var]) + "\n");
-										}*/
+									for (int i = 0; i < 100; ++i) {
+
+										resp.append(to_string(debugBuf[i].time) + ";");
+										resp.append(to_string(debugBuf[i].detect) + ";");
+										resp.append(to_string(debugBuf[i].dada[0]) + "\n");
 
 								}
 								netconn_write(newconn, resp.c_str(), resp.size(), NETCONN_NOCOPY);
@@ -869,10 +832,10 @@ void Debug_udp(void const * argument)
 					osDelay(20);
 				}
 			}
-		}
-		osDelay(1);
-	}
-	/* USER CODE END Debug_udp */
+			*/
+			osDelay(1);
+  }
+  /* USER CODE END Debug_udp */
 }
 
 /* Private application code --------------------------------------------------*/
