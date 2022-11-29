@@ -152,33 +152,59 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 bool sensor :: detectPoll(){
 
 	//if((Result > offsetMin) && (Result < offsetMax)){
+	// если у нас сработка по входным данным и низкий уровень по выходу
 	if(Result > (offsetMin + triger)){
 
-		if(this->id == 1){
-			__NOP();
-		}
-
-		if(oldTimeUP == 0){
-			oldTimeUP = HAL_GetTick();
-		}
-
-		timeUP = HAL_GetTick() - oldTimeUP;
-
-		if(timeUP >= timOut){
+		if(detect == false){ // если сработки нету то проходим процедуру
 			if(this->id == 1){
 				__NOP();
 			}
-			detect = true;
-			oldTimeUP = 0;
 
+			if(oldTimeRising == 0){
+				oldTimeRising = HAL_GetTick();
+			}
+
+			timeRising = HAL_GetTick() - oldTimeRising; // обновляем время на таймере переднего фронта
+
+			// если время вышло значит переводим в 1 и сбрасываем таймера
+			if(timeRising >= timOut){
+				if(this->id == 1){
+					__NOP();
+				}
+				detect = true;
+				oldTimeFalling = 0;
+				oldTimeRising = 0;
+				timeRising = 0;
+				timeFalling = 0;
+			}
+			if(oldTimeFalling !=0) {oldTimeFalling = 0;} // сбрасываем таймер заднего фронта
+		}
+		else{ // иначе сработка есть и процедуру не проходим а только сбрасываем таймера
+			oldTimeFalling = 0;
+			oldTimeRising = 0;
+			timeRising = 0;
+			timeFalling = 0;
 		}
 	}
 	else{
-		if(this->id == 1){
-			__NOP();
+		if(oldTimeRising != 0){ // если таймер переднего запущен то работаем с задним фронтом
+
+			if(oldTimeFalling == 0){// если таймер заднего фронта в нуле значит нужно запустить таймер заднего
+				oldTimeFalling = HAL_GetTick();
+			}
+			timeFalling = HAL_GetTick() - oldTimeFalling; // обновляем время на таймере заднего фронта
+			timeRising = HAL_GetTick() - oldTimeRising;	// обновляем время на таймере переднего фронта
+
+			// если время вышло значит переводим в 0 и сбрасываем таймера
+			if(timeFalling >= timOutFalling){
+				detect = false;
+				oldTimeFalling = 0;
+				oldTimeRising = 0;
+				timeRising = 0;
+				timeFalling = 0;
+			}
 		}
-		detect = false;
-		oldTimeUP = 0;
+
 	}
 	return detect;
 }

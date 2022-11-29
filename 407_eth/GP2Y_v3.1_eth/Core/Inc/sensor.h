@@ -33,6 +33,7 @@ class sensor{
    void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID);
    
    uint32_t timOut = 200;
+   uint32_t timOutFalling = 10;
    bool change_settings = false;
    uint16_t Depth = 10;
 
