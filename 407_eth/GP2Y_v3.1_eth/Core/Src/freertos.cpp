@@ -641,6 +641,7 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "no_CMD";
 										break;
 									case 34:
+										mem_spi.W25qxx_EraseSector(0);
 										mem_spi.Write(settings);
 										arr_cmd[i].err = "OK";
 										break;
@@ -702,7 +703,7 @@ void mainTask2(void const * argument)
 
 		break;
 	default:
-		Error_Handler();
+		//Error_Handler();
 		break;
 	}
 
@@ -745,7 +746,7 @@ void mainTask2(void const * argument)
 
 			break;
 		default:
-			Error_Handler();
+			//Error_Handler();
 			break;
 		}
 

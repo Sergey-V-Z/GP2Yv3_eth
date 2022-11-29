@@ -134,15 +134,19 @@ int main(void)
 
   if((settings.sensorType2 == 0) | (settings.sensorType2 == 0xFFFFFFFF) | resetSettings)
   {
-	  settings.sensorType1 = 3;
-	  settings.sensorType2 = 3;
+	  mem_spi.W25qxx_EraseSector(0);
+
+	  settings.sensorType1 = 2;
+	  settings.sensorType2 = 2;
 	  settings.MAC_end = 0x05;
-	  settings.triger1 = 50;
-	  settings.triger2 = 50;
+	  settings.triger1 = 100;
+	  settings.triger2 = 100;
 	  //settings.offsetMax = 0;
-	  settings.timeCall1 = 3000;
-	  settings.timeCall2 = 3000;
+	  settings.timeCall1 = 5000;
+	  settings.timeCall2 = 5000;
 	  mem_spi.Write(settings);
+
+	  mem_spi.Read(&settings);
   }
   /* USER CODE END 2 */
 

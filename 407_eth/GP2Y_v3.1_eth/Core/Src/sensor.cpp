@@ -196,13 +196,21 @@ bool sensor :: detectPoll(){
 			timeRising = HAL_GetTick() - oldTimeRising;	// обновляем время на таймере переднего фронта
 
 			// если время вышло значит переводим в 0 и сбрасываем таймера
-			if(timeFalling >= timOutFalling){
+			if((timeFalling >= timOutFalling) || (timeRising >= timOut)){
 				detect = false;
 				oldTimeFalling = 0;
 				oldTimeRising = 0;
 				timeRising = 0;
 				timeFalling = 0;
 			}
+		}
+		else{
+
+			detect = false;
+			oldTimeFalling = 0;
+			oldTimeRising = 0;
+			timeRising = 0;
+			timeFalling = 0;
 		}
 
 	}
