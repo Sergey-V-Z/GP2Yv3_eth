@@ -120,6 +120,7 @@ osThreadId ethTasHandle;
 osThreadId MainTask2Handle;
 osThreadId debug_udpHandle;
 osMutexId distanceMutexHandle;
+osMutexId mutexADCHandle;
 osSemaphoreId ADC_endHandle;
 osSemaphoreId ADC_end2Handle;
 
@@ -166,6 +167,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of distanceMutex */
   osMutexDef(distanceMutex);
   distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
+
+  /* definition and creation of mutexADC */
+  osMutexDef(mutexADC);
+  mutexADCHandle = osMutexCreate(osMutex(mutexADC));
 
   /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
@@ -232,45 +237,89 @@ void mainTask(void const * argument)
   MX_LWIP_Init();
   /* USER CODE BEGIN mainTask */
 
-	Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
-	//HAL_TIM_Base_Start_IT(&htim3);
-	Sensor1.setTimeCall(settings.timeCall1);
+	switch (settings.sensorType2) {
+	case 1: // оптика
+		Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
+		Sensor1.setTimeCall(settings.timeCall1);
+		break;
+	case 2: // ултразвук
+		//Sensor1.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
 
-	//static uint32_t prevTime = HAL_GetTick();
-	//static uint32_t GTime = 0;
-	//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
-	//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+		break;
+	default:
+		//Error_Handler();
+		break;
+	}
 
+	//переменные для сбора данных
+	static uint32_t prevTime = HAL_GetTick();
+	static uint32_t GTime = 0;
 	debugSensor tempUnit;
+
 	/* Infinite loop */
 	for(;;)
 	{
+		switch (settings.sensorType1) {
+		case 1: // оптика
+			if(call1){
+				call1 = 0;
+				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
+				osDelay(300);
 
-		if(call1){
-			call1 = 0;
-			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
-			osDelay(300);
-
-			LED_error.LEDon();
-			Sensor1.Call();
-			LED_error.LEDoff();
-
-			HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET);
-		}else{
-			osSemaphoreWait(ADC_endHandle, osWaitForever);
-			Sensor1.data_processing(adc_buffer);
-			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
-
-			if(Sensor1.detectPoll()){
 				LED_error.LEDon();
-				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_RESET);
-			}else{
-				//HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
+				Sensor1.Call();
 				LED_error.LEDoff();
-			}
-		}
 
+				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET);
+			}else{
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
+				//запустить ацп
+				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
+				//подождать симафор от АЦП
+				osSemaphoreWait(ADC_endHandle, osWaitForever);
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
+				// обработать данные
+				Sensor1.data_processing(adc_buffer);
+				//start debug
+				if(debug_I <= 100){
+					debug_I++;
+					tempUnit.time = GTime += ((HAL_GetTick()) - prevTime);
+					prevTime = HAL_GetTick();
+					tempUnit.dada[0] = Sensor1.Get_Result();
+					tempUnit.detect = Sensor1.getdetect();
+					debugBuf.push_back(tempUnit);
+				}else{
+					if(debug_send){
+						debug_send = false;
+						debugBuf.clear();
+						debug_I = 0;
+					}
+				}
+				//end debug
+
+				if(Sensor1.detectPoll()){
+					LED_error.LEDon();
+				}else{
+					LED_error.LEDoff();
+				}
+			}
+			break;
+		case 2: // ултразвук
+			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+			xSemaphoreTake(distanceMutexHandle, 100);
+			distance_ul = Sensor2.getDistance();
+			if(distance_ul<0) distance_ul = 0;
+			xSemaphoreGive(distanceMutexHandle);
+
+			osDelay(100);
+
+			break;
+		default:
+			//Error_Handler();
+			break;
+		}
 
 		//taskYIELD();
 	}
@@ -694,7 +743,7 @@ void mainTask2(void const * argument)
   /* USER CODE BEGIN mainTask2 */
 	switch (settings.sensorType2) {
 	case 1: // оптика
-		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2); // добавить настройки для ультразвука
+		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2);
 		HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 		Sensor2.setTimeCall(settings.timeCall2);
 		break;
@@ -724,9 +773,17 @@ void mainTask2(void const * argument)
 
 				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET);
 			}else{
-				osSemaphoreWait(ADC_end2Handle, osWaitForever);
-				Sensor2.data_processing(adc_buffer2);
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
+				//запустить ацп
 				HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
+				//подождать симафор от АЦП
+				osSemaphoreWait(ADC_end2Handle, osWaitForever);
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
+				// обработать данные
+				Sensor2.data_processing(adc_buffer2);
+				//HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 
 				if(Sensor2.detectPoll()){
 					LED_IPadr.LEDon();
@@ -769,7 +826,7 @@ void mainTask2(void const * argument)
 void Debug_udp(void const * argument)
 {
   /* USER CODE BEGIN Debug_udp */
-/*
+
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
 
 	strIP = ip4addr_ntoa(&gnetif.ip_addr);
@@ -783,11 +840,11 @@ void Debug_udp(void const * argument)
 		//ip_addr_t remote_ip;
 		void 		*in_data = NULL;
 		uint16_t 		data_size = 0;
-*/
+
 		/* Infinite loop */
 		for(;;)
 		{
-/*
+
 			conn = netconn_new(NETCONN_TCP);
 			if (conn!=NULL)
 			{
@@ -811,9 +868,6 @@ void Debug_udp(void const * argument)
 								string resp;
 
 								for (int i = 0; i < 100; ++i) {
-
-									for (int i = 0; i < 100; ++i) {
-
 										resp.append(to_string(debugBuf[i].time) + ";");
 										resp.append(to_string(debugBuf[i].detect) + ";");
 										resp.append(to_string(debugBuf[i].dada[0]) + "\n");
@@ -833,7 +887,7 @@ void Debug_udp(void const * argument)
 					osDelay(20);
 				}
 			}
-			*/
+
 			osDelay(1);
   }
   /* USER CODE END Debug_udp */
