@@ -267,6 +267,7 @@ void mainTask(void const * argument)
 				osDelay(300);
 
 				LED_error.LEDon();
+				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 				Sensor1.Call();
 				LED_error.LEDoff();
 
@@ -768,6 +769,7 @@ void mainTask2(void const * argument)
 				osDelay(300);
 
 				LED_IPadr.LEDon();
+				HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 				Sensor2.Call();
 				LED_IPadr.LEDoff();
 

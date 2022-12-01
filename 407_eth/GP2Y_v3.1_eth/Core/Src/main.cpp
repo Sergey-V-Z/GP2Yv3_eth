@@ -137,7 +137,7 @@ int main(void)
 	  mem_spi.W25qxx_EraseSector(0);
 
 	  settings.sensorType1 = 2;
-	  settings.sensorType2 = 2;
+ 	  settings.sensorType2 = 2;
 	  settings.MAC_end = 0x05;
 	  settings.triger1 = 100;
 	  settings.triger2 = 100;
