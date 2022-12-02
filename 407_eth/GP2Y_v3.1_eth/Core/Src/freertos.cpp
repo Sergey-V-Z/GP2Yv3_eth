@@ -263,15 +263,19 @@ void mainTask(void const * argument)
 		case 1: // оптика
 			if(call1){
 				call1 = 0;
-				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET);
-				osDelay(300);
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
 
+				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET); // питение
 				LED_error.LEDon();
+				osDelay(300);
 				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
 				Sensor1.Call();
 				LED_error.LEDoff();
+				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET); // питение
 
-				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET);
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
 			}else{
 				//взять мютекс
 				osMutexWait(mutexADCHandle, osWaitForever);
@@ -765,15 +769,19 @@ void mainTask2(void const * argument)
 			if(call2){
 				call2 = 0;
 
-				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
-				osDelay(300);
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
 
+				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET); // питание
 				LED_IPadr.LEDon();
+				osDelay(300);
 				HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 				Sensor2.Call();
 				LED_IPadr.LEDoff();
+				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET); // питание
 
-				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET);
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
 			}else{
 				//взять мютекс
 				osMutexWait(mutexADCHandle, osWaitForever);
