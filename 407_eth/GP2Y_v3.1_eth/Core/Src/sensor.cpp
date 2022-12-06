@@ -116,7 +116,7 @@ void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChan
 }
 
 // обробатываем накопленные данные
-void sensor :: data_processing(uint16_t *data){
+void sensor :: DataProcessing(uint16_t *data){
 
 	if(!change_settings){
 		float Output = 0;
@@ -124,21 +124,21 @@ void sensor :: data_processing(uint16_t *data){
 		for (int var = 0; var < Depth; ++var) {
 			//Output += *data;
 			if((*data) >= 400){ //на входе фильтра отсекаем маленькие значенияя
-				Output = expRunningAvgAdaptive(*data); // фильтруем
+				Output = ExpRunningAvgAdaptive(*data); // фильтруем
 				*data = 0; // обнуляем входные данные
 			}
 			data++; // идем дальше
 		}
 
 		/**/
-		Result = (uint16_t) (Output);
+		result = (uint16_t) (Output);
 	}else{
 		Error_Handler();
 	}
 }
 
 // бегущее среднее с адаптивным коэффициентом
-float sensor :: expRunningAvgAdaptive(float newVal) {
+float sensor :: ExpRunningAvgAdaptive(float newVal) {
 	static float filVal = 0;
 
 	// резкость фильтра зависит от модуля разности значений
@@ -149,16 +149,26 @@ float sensor :: expRunningAvgAdaptive(float newVal) {
 	return filVal;
 }
 
-bool sensor :: detectPoll(){
+bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 
-	//if((Result > offsetMin) && (Result < offsetMax)){
+	uint32_t tempTimeOutRising, tempTimeOutFalling;
+
+	if(tRising == 0 && tFalling == 0){
+		tempTimeOutRising = timOutRising;
+		tempTimeOutFalling = timOutFalling;
+	}else{
+		tempTimeOutRising = tRising;
+		tempTimeOutFalling = tFalling;
+	}
+
 	// если у нас сработка по входным данным и низкий уровень по выходу
-	if(Result > (offsetMin + triger)){
+	if(result > (callMinDistance + triger)){
 
 		if(detect == false){ // если сработки нету то проходим процедуру
+			/*
 			if(this->id == 1){
 				__NOP();
-			}
+			}*/
 
 			if(oldTimeRising == 0){
 				oldTimeRising = HAL_GetTick();
@@ -167,7 +177,7 @@ bool sensor :: detectPoll(){
 			timeRising = HAL_GetTick() - oldTimeRising; // обновляем время на таймере переднего фронта
 
 			// если время вышло значит переводим в 1 и сбрасываем таймера
-			if(timeRising >= timOut){
+			if(timeRising >= tempTimeOutRising){
 				if(this->id == 1){
 					__NOP();
 				}
@@ -196,7 +206,7 @@ bool sensor :: detectPoll(){
 			timeRising = HAL_GetTick() - oldTimeRising;	// обновляем время на таймере переднего фронта
 
 			// если время вышло значит переводим в 0 и сбрасываем таймера
-			if((timeFalling >= timOutFalling) || (timeRising >= timOut)){
+			if((timeFalling >= tempTimeOutFalling) || (timeRising >= tempTimeOutRising)){
 				detect = false;
 				oldTimeFalling = 0;
 				oldTimeRising = 0;
@@ -217,43 +227,102 @@ bool sensor :: detectPoll(){
 	return detect;
 }
 
-void sensor :: Call(){
-	peak = 0;
-	gorge = 10000;
+void sensor :: CallDistance(){
+	float peak = 0;
+	float gorge = 10000;
+
 	//добавить защиту при переходе времени через 0
 
 	uint32_t old_time = HAL_GetTick();
+	uint32_t timeF1 = timeCall / 2;
+	//uint32_t timeF2 = timeCall - timeF1;
+
+	//uint32_t timePulse = 0;
+	//uint32_t timePulseOld = 0;
+	//uint32_t timePulseMin = 0;
+	//uint32_t timePulseMax = 0;
+
+	//bool detect = false;
+	//bool detectoOld = false;
 
 	do
 	{
-		osSemaphoreWait(*ADC_endHandle, osWaitForever);
-		data_processing(adc_buffer); // оброботка данных
 		HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, Depth);
+		osSemaphoreWait(*ADC_endHandle, osWaitForever);
+		DataProcessing(adc_buffer); // оброботка данных
 
 		if((HAL_GetTick() - old_time) >= 10) // ждем стабилизации и начинаем писать данные
 		{
-			if(Result > 500){ //отсекаем маленькие значения
-				if(Result > peak){peak = Result;}
-				if(Result < gorge){gorge = Result;}
+			if(result > 500){ //отсекаем маленькие значения
+				if(result > peak){peak = result;}
+				if(result < gorge){gorge = result;}
 			}
 		}
 	}
-	while(!(timeCall <= (HAL_GetTick() - old_time)));
+	while(!(timeF1 <= (HAL_GetTick() - old_time)));
 
-	offsetMax = peak;
-	offsetMin = gorge;
+
+	callMaxDistance = peak;
+	callMinDistance = gorge;
 
 
 }
 
-bool sensor :: getdetect(){
+void sensor :: CallTime(){
+
+	//добавить защиту при переходе времени через 0
+
+	uint32_t old_time = HAL_GetTick();
+	uint32_t timeF1 = timeCall / 2;
+	uint32_t timeF2 = timeCall - timeF1;
+
+	uint32_t timePulse = 0;
+	uint32_t timePulseOld = 0;
+	uint32_t timePulseMin = 0;
+	uint32_t timePulseMax = 0;
+
+	bool detect = false;
+	static bool detectoOld = false;
+
+	do
+	{
+		HAL_ADC_Start_DMA(hadc, (uint32_t*)adc_buffer, Depth);
+		osSemaphoreWait(*ADC_endHandle, osWaitForever);
+		DataProcessing(adc_buffer); // оброботка данных
+
+		detect = DetectPoll(1,1); // детектируем с минимальным временем
+
+		if(detect != detectoOld){
+			if(detect){
+				timePulse = (HAL_GetTick() - timePulseOld);
+			}else{
+				if(timePulse > timePulseMax){timePulseMax = timePulse;}
+				if(timePulse < timePulseMin){timePulseMin = timePulse;}
+			}
+
+		}
+
+		detectoOld = detect;
+		osDelay(1);
+
+
+	}
+	while(!(timeF2 <= (HAL_GetTick() - old_time)));
+
+	callMaxDistance = timePulseMax;
+	callMinDistance = timePulseMin;
+
+
+}
+
+bool sensor :: Getdetect(){
 	if (modePwr == 1) {
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 	}
 	return detect;
 }
 
-void sensor :: pwr_set(uint16_t r){
+void sensor :: PwrSet(uint16_t r){
 
 	switch (r) {
 	case 1:
@@ -273,7 +342,7 @@ void sensor :: pwr_set(uint16_t r){
 	}
 }
 
-uint16_t sensor :: Get_Result(){
+uint16_t sensor :: GetResult(){
 	uint16_t Ret = 0;
 	switch (sensorType) {
 	case Optic: // оптика
@@ -282,7 +351,7 @@ uint16_t sensor :: Get_Result(){
 			HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 		}
 
-		Ret = Result;
+		Ret = result;
 		break;
 	case Ultrasound: // ултразвук
 
@@ -297,28 +366,28 @@ uint16_t sensor :: Get_Result(){
 
 }
 
-void sensor :: setOffsetMin(uint16_t offset){
-	offsetMin = offset;
+void sensor :: SetOffsetMin(uint16_t offset){
+	callMinDistance = offset;
 }
 
-void sensor :: setTrigger(uint16_t offset){
+void sensor :: SetTrigger(uint16_t offset){
 	sensor :: triger = offset;
 }
 
-void sensor :: setOffsetMax(uint16_t offset){
-	offsetMax = offset;
+void sensor :: SetOffsetMax(uint16_t offset){
+	callMaxDistance = offset;
 }
 
-void sensor :: setTimeCall(uint32_t time){
+void sensor :: SetTimeCall(uint32_t time){
 	timeCall = time;
 }
 
-uint16_t sensor :: getOffsetMin(){
-	return offsetMin;
+uint16_t sensor :: GetOffsetMin(){
+	return callMinDistance;
 }
 
-uint16_t sensor :: getOffsetMax(){
-	return offsetMax;
+uint16_t sensor :: GetOffsetMax(){
+	return callMaxDistance;
 }
 
 //for hcsr04
@@ -351,7 +420,7 @@ void sensor :: _acknowledgeChannelCapture()
 	}
 }
 
-float sensor :: getDistanceInSeconds()
+float sensor :: GetDistanceInSeconds()
 {
 	if (echoDelay < 0) {
 		return -1.0f;
@@ -360,12 +429,20 @@ float sensor :: getDistanceInSeconds()
 	}
 }
 
-float sensor :: getDistance()
+float sensor :: GetDistance()
 {
-	float delay = getDistanceInSeconds();
+	float delay = GetDistanceInSeconds();
 	if (delay < 0) {
 		return delay;
 	} else {
 		return delay * soundSpeed;
 	}
+}
+
+void sensor::SetCallChanel(uint16_t ch) {
+	chanelCallTime = ch;
+}
+
+uint16_t sensor::GetCallChanel() {
+	return chanelCallTime;
 }

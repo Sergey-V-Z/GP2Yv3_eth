@@ -240,7 +240,7 @@ void mainTask(void const * argument)
 	switch (settings.sensorType2) {
 	case 1: // оптика
 		Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
-		Sensor1.setTimeCall(settings.timeCall1);
+		Sensor1.SetTimeCall(settings.timeCall1);
 		break;
 	case 2: // ултразвук
 		//Sensor1.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
@@ -269,8 +269,7 @@ void mainTask(void const * argument)
 				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET); // питение
 				LED_error.LEDon();
 				osDelay(300);
-				HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&adc_buffer, Sensor1.Depth);
-				Sensor1.Call();
+				Sensor1.CallDistance();
 				LED_error.LEDoff();
 				HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET); // питение
 
@@ -286,14 +285,14 @@ void mainTask(void const * argument)
 				//вернуть мютекс
 				osMutexRelease(mutexADCHandle);
 				// обработать данные
-				Sensor1.data_processing(adc_buffer);
+				Sensor1.DataProcessing(adc_buffer);
 				//start debug
 				if(debug_I <= 100){
 					debug_I++;
 					tempUnit.time = GTime += ((HAL_GetTick()) - prevTime);
 					prevTime = HAL_GetTick();
-					tempUnit.dada[0] = Sensor1.Get_Result();
-					tempUnit.detect = Sensor1.getdetect();
+					tempUnit.dada[0] = Sensor1.GetResult();
+					tempUnit.detect = Sensor1.Getdetect();
 					debugBuf.push_back(tempUnit);
 				}else{
 					if(debug_send){
@@ -304,7 +303,7 @@ void mainTask(void const * argument)
 				}
 				//end debug
 
-				if(Sensor1.detectPoll()){
+				if(Sensor1.DetectPoll()){
 					LED_error.LEDon();
 				}else{
 					LED_error.LEDoff();
@@ -314,7 +313,7 @@ void mainTask(void const * argument)
 		case 2: // ултразвук
 			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 			xSemaphoreTake(distanceMutexHandle, 100);
-			distance_ul = Sensor2.getDistance();
+			distance_ul = Sensor2.GetDistance();
 			if(distance_ul<0) distance_ul = 0;
 			xSemaphoreGive(distanceMutexHandle);
 
@@ -365,21 +364,21 @@ void led(void const * argument)
 
 		if(Start == 1){
 			Start = 0;
-			Sensor1.pwr_set(2);
+			Sensor1.PwrSet(2);
 		}
 		if(Start == 2){
 			Start = 0;
-			Sensor2.pwr_set(2);
+			Sensor2.PwrSet(2);
 
 		}
 		if(Start == 3){
 			Start = 0;
-			Sensor1.pwr_set(3);
+			Sensor1.PwrSet(3);
 
 		}
 		if(Start == 4){
 			Start = 0;
-			Sensor2.pwr_set(3);
+			Sensor2.PwrSet(3);
 		}
 		if(Start == 5){
 			Start = 0;
@@ -553,32 +552,32 @@ void eth_Task(void const * argument)
 
 									switch (arr_cmd[i].cmd) {
 									case 1: //
-										arr_cmd[i].data_out = (uint32_t)Sensor1.getdetect();
+										arr_cmd[i].data_out = (uint32_t)Sensor1.Getdetect();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										/*arr_cmd[i].data_out = (uint32_t)pMotor->getStatusDirect();
 										arr_cmd[i].need_resp = true;*/
 										break;
 									case 2: //
-										arr_cmd[i].data_out = (uint32_t)Sensor2.getdetect();
+										arr_cmd[i].data_out = (uint32_t)Sensor2.Getdetect();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
 									case 3:
-										Sensor1.pwr_set(arr_cmd[i].data_in);
+										Sensor1.PwrSet(arr_cmd[i].data_in);
 										arr_cmd[i].err = "OK";
 										break;
 									case 4:
-										Sensor2.pwr_set(arr_cmd[i].data_in);
+										Sensor2.PwrSet(arr_cmd[i].data_in);
 										arr_cmd[i].err = "OK";
 										break;
 									case 5: //
-										arr_cmd[i].data_out = (uint32_t)Sensor1.Get_Result();
+										arr_cmd[i].data_out = (uint32_t)Sensor1.GetResult();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
 									case 6://
-										arr_cmd[i].data_out = (uint32_t)Sensor2.Get_Result();
+										arr_cmd[i].data_out = (uint32_t)Sensor2.GetResult();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
@@ -605,30 +604,30 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 11:
-										arr_cmd[i].data_out = (uint32_t)Sensor1.timOut;
+										arr_cmd[i].data_out = (uint32_t)Sensor1.timOutRising;
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
 									case 12:
-										arr_cmd[i].data_out = (uint32_t)Sensor2.timOut;
+										arr_cmd[i].data_out = (uint32_t)Sensor2.timOutRising;
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
 									case 13:
-										Sensor1.timOut = arr_cmd[i].data_in;
+										Sensor1.timOutRising = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
 									case 14:
-										Sensor2.timOut = arr_cmd[i].data_in;
+										Sensor2.timOutRising = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
 									case 15:
-										Sensor1.setTimeCall(arr_cmd[i].data_in);
+										Sensor1.SetTimeCall(arr_cmd[i].data_in);
 										settings.timeCall1 = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
 									case 16:
-										Sensor2.setTimeCall(arr_cmd[i].data_in);
+										Sensor2.SetTimeCall(arr_cmd[i].data_in);
 										settings.timeCall2 = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
@@ -663,11 +662,11 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 24:
-										Sensor1.setTrigger(arr_cmd[i].data_in);
+										Sensor1.SetTrigger(arr_cmd[i].data_in);
 										arr_cmd[i].err = "OK";
 										break;
 									case 25:
-										Sensor2.setTrigger(arr_cmd[i].data_in);
+										Sensor2.SetTrigger(arr_cmd[i].data_in);
 										arr_cmd[i].err = "OK";
 										break;
 									case 26:
@@ -750,7 +749,7 @@ void mainTask2(void const * argument)
 	case 1: // оптика
 		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2);
 		HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
-		Sensor2.setTimeCall(settings.timeCall2);
+		Sensor2.SetTimeCall(settings.timeCall2);
 		break;
 	case 2: // ултразвук
 		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
@@ -775,8 +774,7 @@ void mainTask2(void const * argument)
 				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET); // питание
 				LED_IPadr.LEDon();
 				osDelay(300);
-				HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
-				Sensor2.Call();
+				Sensor2.CallDistance();
 				LED_IPadr.LEDoff();
 				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET); // питание
 
@@ -792,10 +790,10 @@ void mainTask2(void const * argument)
 				//вернуть мютекс
 				osMutexRelease(mutexADCHandle);
 				// обработать данные
-				Sensor2.data_processing(adc_buffer2);
+				Sensor2.DataProcessing(adc_buffer2);
 				//HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 
-				if(Sensor2.detectPoll()){
+				if(Sensor2.DetectPoll()){
 					LED_IPadr.LEDon();
 				}else{
 					LED_IPadr.LEDoff();
@@ -805,7 +803,7 @@ void mainTask2(void const * argument)
 		case 2: // ултразвук
 			HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 			xSemaphoreTake(distanceMutexHandle, 100);
-			distance_ul = Sensor2.getDistance();
+			distance_ul = Sensor2.GetDistance();
 			if(distance_ul<0) distance_ul = 0;
 			xSemaphoreGive(distanceMutexHandle);
 
