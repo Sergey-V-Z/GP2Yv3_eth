@@ -53,6 +53,7 @@ typedef struct
 	//uint16_t offsetMax;
 	uint32_t timeCall1;
 	uint32_t timeCall2;
+	uint32_t offsetTime;
 
 }settings_t;
 

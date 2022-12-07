@@ -17,20 +17,27 @@ class sensor{
 public:
 	sensor() = default;
 	~sensor() = default;
+
 	void SetOffsetMin(uint16_t offset);
 	void SetTrigger(uint16_t offset);
 	void SetCallChanel(uint16_t ch);
 	void SetOffsetMax(uint16_t offset);
 	void SetTimeCall(uint32_t time);
-	void DataProcessing(uint16_t *data);
+	void SetOffsetTime(uint32_t time);
+
 	uint16_t GetOffsetMin();
 	uint16_t GetOffsetMax();
-	bool DetectPoll(uint32_t tRising = 0, uint32_t tFalling = 0);
 	uint16_t GetResult();
 	uint16_t GetCallChanel();
+	uint16_t GetTrigger();
+	uint32_t GetOffsetTime();
 	bool Getdetect();
+	bool StatusCalibration();
+
+	void DataProcessing(uint16_t *data);
 	void CallDistance(); // считывает и сохраняет данные расстояния (расстояние до ленты)
-	void CallTime(); // считывает и сохраняет данные времени(размер ребер на ленте)
+	int CallTime(); // считывает и сохраняет данные времени(размер ребер на ленте)
+	bool DetectPoll(uint32_t tRising = 0, uint32_t tFalling = 0);
 	void PwrSet(uint16_t r);
 	void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed = 343.0f);
 	void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID);
@@ -41,9 +48,6 @@ public:
 	uint16_t Depth = 10;
 
 	//for hcsr04
-
-	/*Note: pins should be configured separatly.*/
-	void init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, float soundSpeed = 343.0f);
 
 	/*This method should be invoked when timer update event occurs*/
 	void _acknowledgeTimerUpdate();
@@ -56,7 +60,6 @@ public:
 
 	/*Negative values will be returned if there is no object before sensor. */
 	float GetDistanceInSeconds();
-
 
 
 private:
@@ -74,14 +77,14 @@ private:
 
 	typedef struct
 	{
-		uint32_t callMinTime = 0; // минимальное время прохождения ребра измеренное при каллибровке
-		uint32_t callMaxTime = 0xFFFFFFFF;  // максимальное время прохождения ребра измеренное при каллибровке
+		uint32_t callTimeMin = 0; // минимальное время прохождения ребра измеренное при каллибровке
+		uint32_t callTimeMax = 0xFFFFFFFF;  // максимальное время прохождения ребра измеренное при каллибровке
 	}callTime_t;
 
 	float ExpRunningAvgAdaptive(float newVal);
 
-	uint16_t callMinDistance = 0;		// зона работы датчика
-	uint16_t callMaxDistance = 4096;	// зона работы датчика
+	uint16_t callDistanceMin = 0;		// зона работы датчика
+	uint16_t callDistanceMax = 4096;	// зона работы датчика
 	callTime_t callTime[3];				// массив с разными каллибровками времени для разных скоростей
 	uint16_t chanelCallTime = 0;		// текущий канал каллибровки
 	uint16_t triger = 100;				// смещение от ленты
@@ -92,6 +95,7 @@ private:
 	float k_L= 0.03;					// коэфицент фильтра для медленных изменений
 	uint16_t result = 0;				// входное напрядение от датчика
 	int id = 0;
+	bool calibrationInProgress = false; // состаяние калибровки
 
 	osSemaphoreId *ADC_endHandle;
 	ADC_HandleTypeDef *hadc;
@@ -103,6 +107,7 @@ private:
 	uint32_t timeRising = 0;
 	uint32_t oldTimeFalling = 0;
 	uint32_t timeFalling = 0;
+	uint32_t offsetTime = 0;
 	SensorType sensorType = NoInit;
 
 	//for hcsr04

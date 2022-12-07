@@ -66,11 +66,6 @@ void led::poll(){
         
       }
 
-      if(LED_mod == mode::BLINK){   
-
-      }else{
-
-      }
    }else{
       HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET); // off led
       Counter_ms = 0;

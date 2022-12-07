@@ -154,7 +154,7 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 	uint32_t tempTimeOutRising, tempTimeOutFalling;
 
 	if(tRising == 0 && tFalling == 0){
-		tempTimeOutRising = timOutRising;
+		tempTimeOutRising = timOutRising + offsetTime;
 		tempTimeOutFalling = timOutFalling;
 	}else{
 		tempTimeOutRising = tRising;
@@ -162,7 +162,7 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 	}
 
 	// если у нас сработка по входным данным и низкий уровень по выходу
-	if(result > (callMinDistance + triger)){
+	if(result > (callDistanceMin + triger)){
 
 		if(detect == false){ // если сработки нету то проходим процедуру
 			/*
@@ -262,14 +262,19 @@ void sensor :: CallDistance(){
 	while(!(timeF1 <= (HAL_GetTick() - old_time)));
 
 
-	callMaxDistance = peak;
-	callMinDistance = gorge;
+	callDistanceMax = peak;
+	callDistanceMin = gorge;
 
 
 }
 
-void sensor :: CallTime(){
+int sensor :: CallTime(){
 
+	//если канал не установлен выходим из функции
+	if(chanelCallTime == 0){
+
+		return 0;
+	}
 	//добавить защиту при переходе времени через 0
 
 	uint32_t old_time = HAL_GetTick();
@@ -282,7 +287,7 @@ void sensor :: CallTime(){
 	uint32_t timePulseMax = 0;
 
 	bool detect = false;
-	static bool detectoOld = false;
+	static bool detectOld = false;
 
 	do
 	{
@@ -292,7 +297,7 @@ void sensor :: CallTime(){
 
 		detect = DetectPoll(1,1); // детектируем с минимальным временем
 
-		if(detect != detectoOld){
+		if(detect != detectOld){
 			if(detect){
 				timePulse = (HAL_GetTick() - timePulseOld);
 			}else{
@@ -302,17 +307,17 @@ void sensor :: CallTime(){
 
 		}
 
-		detectoOld = detect;
+		detectOld = detect;
 		osDelay(1);
 
 
 	}
 	while(!(timeF2 <= (HAL_GetTick() - old_time)));
 
-	callMaxDistance = timePulseMax;
-	callMinDistance = timePulseMin;
+	callTime[chanelCallTime].callTimeMax = timePulseMax;
+	callTime[chanelCallTime].callTimeMin = timePulseMin;
 
-
+	return 1;
 }
 
 bool sensor :: Getdetect(){
@@ -367,7 +372,7 @@ uint16_t sensor :: GetResult(){
 }
 
 void sensor :: SetOffsetMin(uint16_t offset){
-	callMinDistance = offset;
+	callDistanceMin = offset;
 }
 
 void sensor :: SetTrigger(uint16_t offset){
@@ -375,7 +380,7 @@ void sensor :: SetTrigger(uint16_t offset){
 }
 
 void sensor :: SetOffsetMax(uint16_t offset){
-	callMaxDistance = offset;
+	callDistanceMax = offset;
 }
 
 void sensor :: SetTimeCall(uint32_t time){
@@ -383,11 +388,11 @@ void sensor :: SetTimeCall(uint32_t time){
 }
 
 uint16_t sensor :: GetOffsetMin(){
-	return callMinDistance;
+	return callDistanceMin;
 }
 
 uint16_t sensor :: GetOffsetMax(){
-	return callMaxDistance;
+	return callDistanceMax;
 }
 
 //for hcsr04
@@ -445,4 +450,20 @@ void sensor::SetCallChanel(uint16_t ch) {
 
 uint16_t sensor::GetCallChanel() {
 	return chanelCallTime;
+}
+
+uint16_t sensor::GetTrigger(){
+	return triger;
+}
+
+bool sensor::StatusCalibration() {
+	return calibrationInProgress;
+}
+
+void sensor::SetOffsetTime(uint32_t time) {
+	offsetTime = time;
+}
+
+uint32_t sensor::GetOffsetTime() {
+	return offsetTime;
 }
