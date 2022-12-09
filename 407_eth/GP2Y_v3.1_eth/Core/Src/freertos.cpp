@@ -405,7 +405,7 @@ void mainTask2(void const * argument)
 				osMutexRelease(mutexADCHandle);
 				break;
 			case 2: // каллибровка времени
-				call1 = 0;
+				call2 = 0;
 				//взять мютекс
 				osMutexWait(mutexADCHandle, osWaitForever);
 
@@ -742,21 +742,21 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "no_CMD";
 										break;
 									case 11:
-										arr_cmd[i].data_out = (uint32_t)Sensor1.timOutRising;
+										arr_cmd[i].data_out = (uint32_t)Sensor1.GetTimeoutRasing();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
 									case 12:
-										arr_cmd[i].data_out = (uint32_t)Sensor2.timOutRising;
+										arr_cmd[i].data_out = (uint32_t)Sensor2.GetTimeoutRasing();
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";
 										break;
 									case 13:
-										Sensor1.timOutRising = arr_cmd[i].data_in;
+										Sensor1.SetTimeoutRasing(arr_cmd[i].data_in);
 										arr_cmd[i].err = "OK";
 										break;
 									case 14:
-										Sensor2.timOutRising = arr_cmd[i].data_in;
+										Sensor2.SetTimeoutRasing(arr_cmd[i].data_in);
 										arr_cmd[i].err = "OK";
 										break;
 									case 15:
