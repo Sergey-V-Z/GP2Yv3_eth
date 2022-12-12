@@ -154,8 +154,14 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 	uint32_t tempTimeOutRising, tempTimeOutFalling;
 
 	if(tRising == 0 && tFalling == 0){
-		tempTimeOutRising = timOutRising + offsetTime;
-		tempTimeOutFalling = timOutFalling;
+		if(chanelCallTime == 0){
+			tempTimeOutRising = 0;
+			tempTimeOutFalling = 0;
+		}else{
+			tempTimeOutRising = callTime[chanelCallTime].callTimeMax + offsetTime;
+			tempTimeOutFalling = callTime[chanelCallTime].timOutFalling;
+		}
+
 	}else{
 		tempTimeOutRising = tRising;
 		tempTimeOutFalling = tFalling;
@@ -228,13 +234,14 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 }
 
 void sensor :: CallDistance(){
+	calibrationInProgress = true;
 	float peak = 0;
 	float gorge = 10000;
 
 	//добавить защиту при переходе времени через 0
 
 	uint32_t old_time = HAL_GetTick();
-	uint32_t timeF1 = timeCall / 2;
+	uint32_t timeF1 = timeCall;
 	//uint32_t timeF2 = timeCall - timeF1;
 
 	//uint32_t timePulse = 0;
@@ -265,11 +272,12 @@ void sensor :: CallDistance(){
 	callDistanceMax = peak;
 	callDistanceMin = gorge;
 
-
+	calibrationInProgress = false;
 }
 
 int sensor :: CallTime(){
 
+	calibrationInProgress = true;
 	//если канал не установлен выходим из функции
 	if(chanelCallTime == 0){
 
@@ -278,8 +286,8 @@ int sensor :: CallTime(){
 	//добавить защиту при переходе времени через 0
 
 	uint32_t old_time = HAL_GetTick();
-	uint32_t timeF1 = timeCall / 2;
-	uint32_t timeF2 = timeCall - timeF1;
+	//uint32_t timeF1 = timeCall;
+	uint32_t timeF2 = timeCall;
 
 	uint32_t timePulse = 0;
 	uint32_t timePulseOld = 0;
@@ -288,6 +296,7 @@ int sensor :: CallTime(){
 
 	bool detect = false;
 	static bool detectOld = false;
+	timePulseOld = HAL_GetTick();
 
 	do
 	{
@@ -299,10 +308,12 @@ int sensor :: CallTime(){
 
 		if(detect != detectOld){
 			if(detect){
-				timePulse = (HAL_GetTick() - timePulseOld);
+				timePulseOld = HAL_GetTick();
 			}else{
+				timePulse = (HAL_GetTick() - timePulseOld);
 				if(timePulse > timePulseMax){timePulseMax = timePulse;}
 				if(timePulse < timePulseMin){timePulseMin = timePulse;}
+				//timePulseOld = HAL_GetTick();
 			}
 
 		}
@@ -317,6 +328,7 @@ int sensor :: CallTime(){
 	callTime[chanelCallTime].callTimeMax = timePulseMax;
 	callTime[chanelCallTime].callTimeMin = timePulseMin;
 
+	calibrationInProgress = false;
 	return 1;
 }
 
@@ -466,4 +478,23 @@ void sensor::SetOffsetTime(uint32_t time) {
 
 uint32_t sensor::GetOffsetTime() {
 	return offsetTime;
+}
+
+uint32_t sensor::GetTimeoutRasing() {
+	if(chanelCallTime == 0){
+		return 0;
+	}
+	else{
+		return callTime[chanelCallTime].callTimeMax;
+	}
+
+}
+
+void sensor::SetTimeoutRasing(uint32_t time) {
+	if(chanelCallTime == 0){
+		//
+	}
+	else{
+		callTime[chanelCallTime].callTimeMax = time;
+	}
 }

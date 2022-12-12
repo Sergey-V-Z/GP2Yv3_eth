@@ -24,6 +24,7 @@ public:
 	void SetOffsetMax(uint16_t offset);
 	void SetTimeCall(uint32_t time);
 	void SetOffsetTime(uint32_t time);
+	void SetTimeoutRasing(uint32_t time);
 
 	uint16_t GetOffsetMin();
 	uint16_t GetOffsetMax();
@@ -31,6 +32,7 @@ public:
 	uint16_t GetCallChanel();
 	uint16_t GetTrigger();
 	uint32_t GetOffsetTime();
+	uint32_t GetTimeoutRasing();
 	bool Getdetect();
 	bool StatusCalibration();
 
@@ -42,8 +44,8 @@ public:
 	void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed = 343.0f);
 	void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID);
 
-	uint32_t timOutRising = 200;
-	uint32_t timOutFalling = 10;
+	//uint32_t timOutRising = 200;
+	//uint32_t timOutFalling = 10;
 	bool change_settings = false;
 	uint16_t Depth = 10;
 
@@ -77,15 +79,16 @@ private:
 
 	typedef struct
 	{
-		uint32_t callTimeMin = 0; // минимальное время прохождения ребра измеренное при каллибровке
-		uint32_t callTimeMax = 0xFFFFFFFF;  // максимальное время прохождения ребра измеренное при каллибровке
+		uint32_t callTimeMin = 0xFFFFFFFF; // минимальное время прохождения ребра измеренное при каллибровке
+		uint32_t callTimeMax = 0;  // максимальное время прохождения ребра измеренное при каллибровке
+		uint32_t timOutFalling = 10;
 	}callTime_t;
 
 	float ExpRunningAvgAdaptive(float newVal);
 
 	uint16_t callDistanceMin = 0;		// зона работы датчика
 	uint16_t callDistanceMax = 4096;	// зона работы датчика
-	callTime_t callTime[3];				// массив с разными каллибровками времени для разных скоростей
+	callTime_t callTime[4];				// массив с разными каллибровками времени для разных скоростей
 	uint16_t chanelCallTime = 0;		// текущий канал каллибровки
 	uint16_t triger = 100;				// смещение от ленты
 	uint32_t timeCall = 5000;			// время выполнение калибровки
