@@ -89,7 +89,7 @@ extern sensor Sensor2;
 //sensor Sensor3;
 //extern HCSR04Driver hcsr04Driver;
 bool ultrasens2 = false;
-float distance_ul = 0.0;
+float distance_ul_S2 = 0.0, distance_ul_S1 = 0.0;
 uint16_t call1 = 0, call2 = 0;
 
 extern led LED_IPadr;
@@ -119,8 +119,9 @@ osThreadId LEDHandle;
 osThreadId ethTasHandle;
 osThreadId MainTask2Handle;
 osThreadId debug_udpHandle;
-osMutexId distanceMutexHandle;
+osMutexId s2DistanceMutexHandle;
 osMutexId mutexADCHandle;
+osMutexId s1DistanceMutexHandle;
 osSemaphoreId ADC_endHandle;
 osSemaphoreId ADC_end2Handle;
 
@@ -155,72 +156,76 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
 void MX_FREERTOS_Init(void) {
-	/* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-	/* USER CODE END Init */
-	/* Create the mutex(es) */
-	/* definition and creation of distanceMutex */
-	osMutexDef(distanceMutex);
-	distanceMutexHandle = osMutexCreate(osMutex(distanceMutex));
+  /* USER CODE END Init */
+  /* Create the mutex(es) */
+  /* definition and creation of s2DistanceMutex */
+  osMutexDef(s2DistanceMutex);
+  s2DistanceMutexHandle = osMutexCreate(osMutex(s2DistanceMutex));
 
-	/* definition and creation of mutexADC */
-	osMutexDef(mutexADC);
-	mutexADCHandle = osMutexCreate(osMutex(mutexADC));
+  /* definition and creation of mutexADC */
+  osMutexDef(mutexADC);
+  mutexADCHandle = osMutexCreate(osMutex(mutexADC));
 
-	/* USER CODE BEGIN RTOS_MUTEX */
+  /* definition and creation of s1DistanceMutex */
+  osMutexDef(s1DistanceMutex);
+  s1DistanceMutexHandle = osMutexCreate(osMutex(s1DistanceMutex));
+
+  /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
-	/* USER CODE END RTOS_MUTEX */
+  /* USER CODE END RTOS_MUTEX */
 
-	/* Create the semaphores(s) */
-	/* definition and creation of ADC_end */
-	osSemaphoreDef(ADC_end);
-	ADC_endHandle = osSemaphoreCreate(osSemaphore(ADC_end), 1);
+  /* Create the semaphores(s) */
+  /* definition and creation of ADC_end */
+  osSemaphoreDef(ADC_end);
+  ADC_endHandle = osSemaphoreCreate(osSemaphore(ADC_end), 1);
 
-	/* definition and creation of ADC_end2 */
-	osSemaphoreDef(ADC_end2);
-	ADC_end2Handle = osSemaphoreCreate(osSemaphore(ADC_end2), 1);
+  /* definition and creation of ADC_end2 */
+  osSemaphoreDef(ADC_end2);
+  ADC_end2Handle = osSemaphoreCreate(osSemaphore(ADC_end2), 1);
 
-	/* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
 	/* add semaphores, ... */
-	/* USER CODE END RTOS_SEMAPHORES */
+  /* USER CODE END RTOS_SEMAPHORES */
 
-	/* USER CODE BEGIN RTOS_TIMERS */
+  /* USER CODE BEGIN RTOS_TIMERS */
 	/* start timers, add new ones, ... */
-	/* USER CODE END RTOS_TIMERS */
+  /* USER CODE END RTOS_TIMERS */
 
-	/* USER CODE BEGIN RTOS_QUEUES */
+  /* USER CODE BEGIN RTOS_QUEUES */
 	/* add queues, ... */
-	/* USER CODE END RTOS_QUEUES */
+  /* USER CODE END RTOS_QUEUES */
 
-	/* Create the thread(s) */
-	/* definition and creation of MainTask */
-	osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 256);
-	MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
+  /* Create the thread(s) */
+  /* definition and creation of MainTask */
+  osThreadDef(MainTask, mainTask, osPriorityNormal, 0, 256);
+  MainTaskHandle = osThreadCreate(osThread(MainTask), NULL);
 
-	/* definition and creation of LED */
-	osThreadDef(LED, led, osPriorityNormal, 0, 128);
-	LEDHandle = osThreadCreate(osThread(LED), NULL);
+  /* definition and creation of LED */
+  osThreadDef(LED, led, osPriorityNormal, 0, 128);
+  LEDHandle = osThreadCreate(osThread(LED), NULL);
 
-	/* definition and creation of ethTas */
-	osThreadDef(ethTas, eth_Task, osPriorityNormal, 0, 512);
-	ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
+  /* definition and creation of ethTas */
+  osThreadDef(ethTas, eth_Task, osPriorityNormal, 0, 512);
+  ethTasHandle = osThreadCreate(osThread(ethTas), NULL);
 
-	/* definition and creation of MainTask2 */
-	osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 256);
-	MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
+  /* definition and creation of MainTask2 */
+  osThreadDef(MainTask2, mainTask2, osPriorityNormal, 0, 256);
+  MainTask2Handle = osThreadCreate(osThread(MainTask2), NULL);
 
-	/* definition and creation of debug_udp */
-	osThreadDef(debug_udp, Debug_udp, osPriorityNormal, 0, 512);
-	debug_udpHandle = osThreadCreate(osThread(debug_udp), NULL);
+  /* definition and creation of debug_udp */
+  osThreadDef(debug_udp, Debug_udp, osPriorityNormal, 0, 512);
+  debug_udpHandle = osThreadCreate(osThread(debug_udp), NULL);
 
-	/* USER CODE BEGIN RTOS_THREADS */
+  /* USER CODE BEGIN RTOS_THREADS */
 	/* add threads, ... */
-	/* USER CODE END RTOS_THREADS */
+  /* USER CODE END RTOS_THREADS */
 
 }
 
@@ -233,9 +238,11 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_mainTask */
 void mainTask(void const * argument)
 {
-	/* init code for LWIP */
-	MX_LWIP_Init();
-	/* USER CODE BEGIN mainTask */
+  /* init code for LWIP */
+  MX_LWIP_Init();
+  /* USER CODE BEGIN mainTask */
+
+	float temp_distance_ul = 0.0;
 
 	switch (settings.sensorType2) {
 	case 1: // оптика
@@ -243,7 +250,7 @@ void mainTask(void const * argument)
 		Sensor1.SetTimeCall(settings.timeCall1);
 		break;
 	case 2: // ултразвук
-		//Sensor1.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
+		Sensor1.Init(TIM8,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 1);
 
 		break;
 	default:
@@ -337,11 +344,15 @@ void mainTask(void const * argument)
 
 			break;
 			case 2: // ултразвук
-				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
-				xSemaphoreTake(distanceMutexHandle, 100);
-				distance_ul = Sensor2.GetDistance();
-				if(distance_ul<0) distance_ul = 0;
-				xSemaphoreGive(distanceMutexHandle);
+				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+				xSemaphoreTake(s2DistanceMutexHandle, 100);
+				temp_distance_ul = Sensor1.GetDistance();
+				if(distance_ul_S1 < 0) {
+					//distance_ul_S2 = 0;
+				}else{
+					distance_ul_S1 = temp_distance_ul;
+				}
+				xSemaphoreGive(s2DistanceMutexHandle);
 
 				osDelay(100);
 
@@ -353,115 +364,7 @@ void mainTask(void const * argument)
 
 		//taskYIELD();
 	}
-	/* USER CODE END mainTask */
-}
-
-/* USER CODE BEGIN Header_mainTask2 */
-/**
- * @brief Function implementing the MainTask2 thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_mainTask2 */
-void mainTask2(void const * argument)
-{
-	/* USER CODE BEGIN mainTask2 */
-	switch (settings.sensorType2) {
-	case 1: // оптика
-		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2);
-		HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
-		Sensor2.SetTimeCall(settings.timeCall2);
-		break;
-	case 2: // ултразвук
-		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
-
-		break;
-	default:
-		//Error_Handler();
-		break;
-	}
-
-	/* Infinite loop */
-	for(;;)
-	{
-		switch (settings.sensorType2) {
-		case 1: // оптика
-			switch (call2) {
-			case 1: // каллибровка дистанции
-				call2 = 0;
-				//взять мютекс
-				osMutexWait(mutexADCHandle, osWaitForever);
-
-				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET); // питание
-				Sensor2.PwrSet(2); // pwr on
-				LED_IPadr.LEDon();
-				osDelay(300);
-				Sensor2.CallDistance();
-				LED_IPadr.LEDoff();
-				Sensor2.PwrSet(3); // pwr off
-				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET); // питание
-
-				//вернуть мютекс
-				osMutexRelease(mutexADCHandle);
-				break;
-			case 2: // каллибровка времени
-				call2 = 0;
-				//взять мютекс
-				osMutexWait(mutexADCHandle, osWaitForever);
-
-				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET); // питение
-				Sensor2.PwrSet(2); // pwr on
-				LED_IPadr.LEDon();
-				osDelay(300);
-				if(Sensor2.CallTime()){
-					LED_IPadr.LEDoff();
-					LED_IPadr.LEDon(10);
-				}
-				LED_IPadr.LEDoff();
-				Sensor2.PwrSet(3); // pwr off
-				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET); // питение
-
-				//вернуть мютекс
-				osMutexRelease(mutexADCHandle);
-				break;
-			default:
-				//взять мютекс
-				osMutexWait(mutexADCHandle, osWaitForever);
-				//запустить ацп
-				HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
-				//подождать симафор от АЦП
-				osSemaphoreWait(ADC_end2Handle, osWaitForever);
-				//вернуть мютекс
-				osMutexRelease(mutexADCHandle);
-				// обработать данные
-				Sensor2.DataProcessing(adc_buffer2);
-				//HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
-
-				if(Sensor2.DetectPoll()){
-					LED_IPadr.LEDon();
-				}else{
-					LED_IPadr.LEDoff();
-				}
-				break;
-			}
-
-			break;
-			case 2: // ултразвук
-				HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
-				xSemaphoreTake(distanceMutexHandle, 100);
-				distance_ul = Sensor2.GetDistance();
-				if(distance_ul<0) distance_ul = 0;
-				xSemaphoreGive(distanceMutexHandle);
-				osDelay(100);
-
-				break;
-			default:
-				//Error_Handler();
-				break;
-		}
-
-	}
-	/* USER CODE END mainTask2 */
+  /* USER CODE END mainTask */
 }
 
 /* USER CODE BEGIN Header_led */
@@ -473,7 +376,7 @@ void mainTask2(void const * argument)
 /* USER CODE END Header_led */
 void led(void const * argument)
 {
-	/* USER CODE BEGIN led */
+  /* USER CODE BEGIN led */
 	/* Infinite loop */
 	HAL_GPIO_WritePin(R_GPIO_Port, R_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(G_GPIO_Port, G_Pin, GPIO_PIN_SET);
@@ -534,7 +437,7 @@ void led(void const * argument)
 		//taskYIELD();
 		//osDelayUntil(&tickcount, 1); // задача будет вызываься ровро через 1 милисекунду
 	}
-	/* USER CODE END led */
+  /* USER CODE END led */
 }
 
 /* USER CODE BEGIN Header_eth_Task */
@@ -546,7 +449,7 @@ void led(void const * argument)
 /* USER CODE END Header_eth_Task */
 void eth_Task(void const * argument)
 {
-	/* USER CODE BEGIN eth_Task */
+  /* USER CODE BEGIN eth_Task */
 
 
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
@@ -716,26 +619,26 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 7://
-/*										arr_cmd[i].data_out = (uint32_t)Sensor1.Depth;
+										/*										arr_cmd[i].data_out = (uint32_t)Sensor1.Depth;
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";*/
 										arr_cmd[i].err = "no_CMD";
 										break;
 									case 8:
-/*										arr_cmd[i].data_out = (uint32_t)Sensor2.Depth;
+										/*										arr_cmd[i].data_out = (uint32_t)Sensor2.Depth;
 										arr_cmd[i].need_resp = true;
 										arr_cmd[i].err = "OK";*/
 										arr_cmd[i].err = "no_CMD";
 										break;
 									case 9:
-/*										Sensor1.change_settings = true; // включение режима настроек
+										/*										Sensor1.change_settings = true; // включение режима настроек
 										Sensor1.Depth = arr_cmd[i].data_in;
 										Sensor1.change_settings = false; // выключение режима настроек
 										arr_cmd[i].err = "OK";*/
 										arr_cmd[i].err = "no_CMD";
 										break;
 									case 10:
-/*										Sensor2.change_settings = true; // включение режима настроек
+										/*										Sensor2.change_settings = true; // включение режима настроек
 										Sensor2.Depth = arr_cmd[i].data_in;
 										Sensor2.change_settings = false; // выключение режима настроек
 										arr_cmd[i].err = "OK";*/
@@ -780,9 +683,9 @@ void eth_Task(void const * argument)
 										break;
 									case 19://данные от ултразвука
 										arr_cmd[i].need_resp = true;
-										xSemaphoreTake(distanceMutexHandle, 100);
-										arr_cmd[i].data_out = (uint32_t)(distance_ul*100); //переводим в сантиметры и сохранияем
-										xSemaphoreGive(distanceMutexHandle);
+										xSemaphoreTake(s2DistanceMutexHandle, 100);
+										arr_cmd[i].data_out = (uint32_t)(distance_ul_S2*100); //переводим в сантиметры и сохранияем
+										xSemaphoreGive(s2DistanceMutexHandle);
 										arr_cmd[i].err = "OK";
 										break;
 									case 20://включение в качестве второго сенсора ултразвук
@@ -922,7 +825,122 @@ void eth_Task(void const * argument)
 		}
 		osDelay(1);
 	}
-	/* USER CODE END eth_Task */
+  /* USER CODE END eth_Task */
+}
+
+/* USER CODE BEGIN Header_mainTask2 */
+/**
+ * @brief Function implementing the MainTask2 thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_mainTask2 */
+void mainTask2(void const * argument)
+{
+  /* USER CODE BEGIN mainTask2 */
+
+	float temp_distance_ul = 0.0;
+
+	switch (settings.sensorType2) {
+	case 1: // оптика
+		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2);
+		HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
+		Sensor2.SetTimeCall(settings.timeCall2);
+		break;
+	case 2: // ултразвук
+		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
+
+		break;
+	default:
+		//Error_Handler();
+		break;
+	}
+
+	/* Infinite loop */
+	for(;;)
+	{
+		switch (settings.sensorType2) {
+		case 1: // оптика
+			switch (call2) {
+			case 1: // каллибровка дистанции
+				call2 = 0;
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
+
+				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET); // питание
+				Sensor2.PwrSet(2); // pwr on
+				LED_IPadr.LEDon();
+				osDelay(300);
+				Sensor2.CallDistance();
+				LED_IPadr.LEDoff();
+				Sensor2.PwrSet(3); // pwr off
+				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_RESET); // питание
+
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
+				break;
+			case 2: // каллибровка времени
+				call2 = 0;
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
+
+				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET); // питение
+				Sensor2.PwrSet(2); // pwr on
+				LED_IPadr.LEDon();
+				osDelay(300);
+				if(Sensor2.CallTime()){
+					LED_IPadr.LEDoff();
+					LED_IPadr.LEDon(10);
+				}
+				LED_IPadr.LEDoff();
+				Sensor2.PwrSet(3); // pwr off
+				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET); // питение
+
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
+				break;
+			default:
+				//взять мютекс
+				osMutexWait(mutexADCHandle, osWaitForever);
+				//запустить ацп
+				HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
+				//подождать симафор от АЦП
+				osSemaphoreWait(ADC_end2Handle, osWaitForever);
+				//вернуть мютекс
+				osMutexRelease(mutexADCHandle);
+				// обработать данные
+				Sensor2.DataProcessing(adc_buffer2);
+				//HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
+
+				if(Sensor2.DetectPoll()){
+					LED_IPadr.LEDon();
+				}else{
+					LED_IPadr.LEDoff();
+				}
+				break;
+			}
+
+			break;
+			case 2: // ултразвук
+				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
+				xSemaphoreTake(s2DistanceMutexHandle, 100);
+				distance_ul_S2 = Sensor2.GetDistance();
+				if(distance_ul_S2 < 0) {
+					//distance_ul_S2 = 0;
+				}else{
+					distance_ul_S2 = temp_distance_ul;
+				}
+				xSemaphoreGive(s2DistanceMutexHandle);
+				osDelay(100);
+
+				break;
+			default:
+				//Error_Handler();
+				break;
+		}
+
+	}
+  /* USER CODE END mainTask2 */
 }
 
 /* USER CODE BEGIN Header_Debug_udp */
@@ -934,7 +952,7 @@ void eth_Task(void const * argument)
 /* USER CODE END Header_Debug_udp */
 void Debug_udp(void const * argument)
 {
-	/* USER CODE BEGIN Debug_udp */
+  /* USER CODE BEGIN Debug_udp */
 
 	while(gnetif.ip_addr.addr == 0){osDelay(1);}	//ждем получение адреса
 
@@ -999,7 +1017,7 @@ void Debug_udp(void const * argument)
 
 		osDelay(1);
 	}
-	/* USER CODE END Debug_udp */
+  /* USER CODE END Debug_udp */
 }
 
 /* Private application code --------------------------------------------------*/

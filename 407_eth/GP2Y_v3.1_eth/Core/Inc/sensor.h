@@ -41,7 +41,7 @@ public:
 	int CallTime(); // считывает и сохраняет данные времени(размер ребер на ленте)
 	bool DetectPoll(uint32_t tRising = 0, uint32_t tFalling = 0);
 	void PwrSet(uint16_t r);
-	void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed = 343.0f);
+	void Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed = 343000.0f); // скорость звука указана в милиметрах/сек
 	void Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID);
 
 	//uint32_t timOutRising = 200;
