@@ -250,7 +250,7 @@ void mainTask(void const * argument)
 		Sensor1.SetTimeCall(settings.timeCall1);
 		break;
 	case 2: // ултразвук
-		Sensor1.Init(TIM8,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 1);
+		Sensor1.Init(TIM3,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 1);
 
 		break;
 	default:
