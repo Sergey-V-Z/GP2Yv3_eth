@@ -21,7 +21,7 @@ void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint1
 	}
 }
 
-void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, int ID, float soundSpeed)
+void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID, float soundSpeed)
 {
 	id = ID;
 	if(sensorType == NoInit){
@@ -40,6 +40,8 @@ void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChan
 		hTim.Instance = tim;
 		this->triggerChannel = triggerChannel;
 		this->echoChannel = echoChannel;
+		this->GPIO_pwr = GPIO_pwr;
+		this->Pin_pwr = Pin_pwr;
 
 		// configure and initizialize timer
 		hTim.State = HAL_TIM_STATE_RESET;

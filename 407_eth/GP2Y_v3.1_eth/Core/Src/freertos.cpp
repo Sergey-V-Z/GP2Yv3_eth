@@ -244,13 +244,13 @@ void mainTask(void const * argument)
 
 	float temp_distance_ul = 0.0;
 
-	switch (settings.sensorType2) {
+	switch (settings.sensorType1) {
 	case 1: // оптика
 		Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
 		Sensor1.SetTimeCall(settings.timeCall1);
 		break;
 	case 2: // ултразвук
-		Sensor1.Init(TIM3,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 1);
+		Sensor1.Init(TIM3,TIM_CHANNEL_1 ,TIM_CHANNEL_2, pwr1_GPIO_Port, pwr1_Pin, 1);
 
 		break;
 	default:
@@ -345,14 +345,14 @@ void mainTask(void const * argument)
 			break;
 			case 2: // ултразвук
 				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
-				xSemaphoreTake(s2DistanceMutexHandle, 100);
+				xSemaphoreTake(s1DistanceMutexHandle, 100);
 				temp_distance_ul = Sensor1.GetDistance();
-				if(distance_ul_S1 < 0) {
+				if(temp_distance_ul < 0) {
 					//distance_ul_S2 = 0;
 				}else{
 					distance_ul_S1 = temp_distance_ul;
 				}
-				xSemaphoreGive(s2DistanceMutexHandle);
+				xSemaphoreGive(s1DistanceMutexHandle);
 
 				osDelay(100);
 
@@ -848,7 +848,7 @@ void mainTask2(void const * argument)
 		Sensor2.SetTimeCall(settings.timeCall2);
 		break;
 	case 2: // ултразвук
-		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, 2);
+		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, pwr2_GPIO_Port, pwr2_Pin, 2);
 
 		break;
 	default:
@@ -924,8 +924,8 @@ void mainTask2(void const * argument)
 			case 2: // ултразвук
 				//HAL_GPIO_WritePin(pwr2_GPIO_Port, pwr2_Pin, GPIO_PIN_SET);
 				xSemaphoreTake(s2DistanceMutexHandle, 100);
-				distance_ul_S2 = Sensor2.GetDistance();
-				if(distance_ul_S2 < 0) {
+				temp_distance_ul = Sensor2.GetDistance();
+				if(temp_distance_ul < 0) {
 					//distance_ul_S2 = 0;
 				}else{
 					distance_ul_S2 = temp_distance_ul;
@@ -1041,7 +1041,9 @@ void HAL_TIM_IC_CaptureCallback (TIM_HandleTypeDef *htim)
 	if (htim->Instance == TIM4) {
 		Sensor2._acknowledgeChannelCapture();
 	}
-
+	if (htim->Instance == TIM3) {
+		Sensor1._acknowledgeChannelCapture();
+	}
 }
 
 /* USER CODE END Application */

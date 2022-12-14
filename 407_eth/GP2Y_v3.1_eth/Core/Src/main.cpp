@@ -121,7 +121,6 @@ int main(void)
   MX_SPI3_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
-  MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(eth_NRST_GPIO_Port, eth_NRST_Pin, GPIO_PIN_SET);
 
@@ -237,7 +236,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim->Instance == TIM4) {
 	  Sensor2._acknowledgeTimerUpdate();
   }
-
+  if (htim->Instance == TIM3) {
+	  Sensor1._acknowledgeTimerUpdate();
+  }
   /* USER CODE END Callback 1 */
 }
 
