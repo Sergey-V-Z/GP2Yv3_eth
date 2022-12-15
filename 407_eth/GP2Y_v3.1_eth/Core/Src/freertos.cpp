@@ -88,7 +88,7 @@ extern sensor Sensor1;
 extern sensor Sensor2;
 //sensor Sensor3;
 //extern HCSR04Driver hcsr04Driver;
-bool ultrasens2 = false;
+//bool ultrasens2 = false;
 float distance_ul_S2 = 0.0, distance_ul_S1 = 0.0;
 uint16_t call1 = 0, call2 = 0;
 
@@ -678,21 +678,26 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 18://включение в качестве первого сенсора ултразвук
-										ultrasens2 = (bool)arr_cmd[i].data_in;
+										settings.sensorType1 = (bool)arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
 									case 19://данные от ултразвука
 										arr_cmd[i].need_resp = true;
-										xSemaphoreTake(s2DistanceMutexHandle, 100);
-										arr_cmd[i].data_out = (uint32_t)(distance_ul_S2*100); //переводим в сантиметры и сохранияем
-										xSemaphoreGive(s2DistanceMutexHandle);
+										xSemaphoreTake(s1DistanceMutexHandle, 100);
+										arr_cmd[i].data_out = (uint32_t)(distance_ul_S1); //переводим в сантиметры и сохранияем
+										xSemaphoreGive(s1DistanceMutexHandle);
 										arr_cmd[i].err = "OK";
 										break;
 									case 20://включение в качестве второго сенсора ултразвук
-										arr_cmd[i].err = "no_CMD";
+										settings.sensorType2 = (bool)arr_cmd[i].data_in;
+										arr_cmd[i].err = "OK";
 										break;
 									case 21://данные от ултразвука 2
-										arr_cmd[i].err = "no_CMD";
+										arr_cmd[i].need_resp = true;
+										xSemaphoreTake(s2DistanceMutexHandle, 100);
+										arr_cmd[i].data_out = (uint32_t)(distance_ul_S2); //переводим в сантиметры и сохранияем
+										xSemaphoreGive(s2DistanceMutexHandle);
+										arr_cmd[i].err = "OK";
 										break;
 									case 22: // коллибровка S1
 										if(arr_cmd[i].data_in == 1){
