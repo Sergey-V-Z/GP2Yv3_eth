@@ -348,7 +348,7 @@ void mainTask(void const * argument)
 				xSemaphoreTake(s1DistanceMutexHandle, 100);
 				temp_distance_ul = Sensor1.GetDistance();
 				if(temp_distance_ul < 0) {
-					//distance_ul_S2 = 0;
+					distance_ul_S2 = 0;
 				}else{
 					distance_ul_S1 = temp_distance_ul;
 				}
@@ -673,13 +673,21 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 17:
-										call1 = 1;
-										call2 = 1;
-										arr_cmd[i].err = "OK";
+										//call1 = 1;
+										//call2 = 1;
+										//arr_cmd[i].err = "OK";
+										arr_cmd[i].err = "no_CMD";
 										break;
 									case 18://включение в качестве первого сенсора ултразвук
-										settings.sensorType1 = (bool)arr_cmd[i].data_in;
-										arr_cmd[i].err = "OK";
+										if(arr_cmd[i].data_in == 1){
+											settings.sensorType1 = 1;
+											arr_cmd[i].err = "OK";
+										}else if (arr_cmd[i].data_in == 2){
+											settings.sensorType1 = 2;
+											arr_cmd[i].err = "OK";
+										}else{
+											arr_cmd[i].err = "errData";
+										}
 										break;
 									case 19://данные от ултразвука
 										arr_cmd[i].need_resp = true;
@@ -689,8 +697,16 @@ void eth_Task(void const * argument)
 										arr_cmd[i].err = "OK";
 										break;
 									case 20://включение в качестве второго сенсора ултразвук
-										settings.sensorType2 = (bool)arr_cmd[i].data_in;
-										arr_cmd[i].err = "OK";
+										if(arr_cmd[i].data_in == 1){
+											settings.sensorType2 = 1;
+											arr_cmd[i].err = "OK";
+										}else if (arr_cmd[i].data_in == 2){
+											settings.sensorType2 = 2;
+											arr_cmd[i].err = "OK";
+										}else{
+											arr_cmd[i].err = "errData";
+										}
+
 										break;
 									case 21://данные от ултразвука 2
 										arr_cmd[i].need_resp = true;
@@ -931,7 +947,7 @@ void mainTask2(void const * argument)
 				xSemaphoreTake(s2DistanceMutexHandle, 100);
 				temp_distance_ul = Sensor2.GetDistance();
 				if(temp_distance_ul < 0) {
-					//distance_ul_S2 = 0;
+					distance_ul_S2 = 0;
 				}else{
 					distance_ul_S2 = temp_distance_ul;
 				}
