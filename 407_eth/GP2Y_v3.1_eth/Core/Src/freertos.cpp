@@ -100,6 +100,7 @@ extern led LED_OSstart;
 vector<debugSensor> debugBuf;
 uint32_t debug_I = 0;
 bool debug_send = false;
+uint32_t g_Result, g_Detect;
 
 //структуры для netcon
 extern struct netif gnetif;

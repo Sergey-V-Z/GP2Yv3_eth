@@ -4,6 +4,7 @@
 //extern ADC_HandleTypeDef hadc2;
 //extern ADC_HandleTypeDef hadc1;
 //extern uint16_t adc_buffer[1024];
+extern uint32_t g_Result, g_Detect;
 
 void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID)
 {
@@ -125,7 +126,7 @@ void sensor :: DataProcessing(uint16_t *data){
 		/* Sum */
 		for (int var = 0; var < Depth; ++var) {
 			//Output += *data;
-			if((*data) >= 400){ //на входе фильтра отсекаем маленькие значенияя
+			if((*data) >= 100){ //на входе фильтра отсекаем маленькие значенияя
 				Output = ExpRunningAvgAdaptive(*data); // фильтруем
 				*data = 0; // обнуляем входные данные
 			}
@@ -134,8 +135,9 @@ void sensor :: DataProcessing(uint16_t *data){
 
 		/**/
 		result = (uint16_t) (Output);
+		g_Result = result;
 	}else{
-		Error_Handler();
+		//Error_Handler();
 	}
 }
 
@@ -155,7 +157,9 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 
 	uint32_t tempTimeOutRising, tempTimeOutFalling;
 
+	// если таймауты не переданы в функцию или они нулевые выставляем из откалиброванных данных
 	if(tRising == 0 && tFalling == 0){
+
 		if(chanelCallTime == 0){
 			tempTimeOutRising = 0;
 			tempTimeOutFalling = 0;
@@ -173,10 +177,6 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 	if(result > (callDistanceMin + triger)){
 
 		if(detect == false){ // если сработки нету то проходим процедуру
-			/*
-			if(this->id == 1){
-				__NOP();
-			}*/
 
 			if(oldTimeRising == 0){
 				oldTimeRising = HAL_GetTick();
@@ -186,9 +186,6 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 
 			// если время вышло значит переводим в 1 и сбрасываем таймера
 			if(timeRising >= tempTimeOutRising){
-				if(this->id == 1){
-					__NOP();
-				}
 				detect = true;
 				oldTimeFalling = 0;
 				oldTimeRising = 0;
@@ -232,6 +229,7 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 		}
 
 	}
+	g_Detect = detect;
 	return detect;
 }
 
