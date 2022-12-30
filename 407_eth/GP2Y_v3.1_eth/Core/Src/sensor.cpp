@@ -4,7 +4,6 @@
 //extern ADC_HandleTypeDef hadc2;
 //extern ADC_HandleTypeDef hadc1;
 //extern uint16_t adc_buffer[1024];
-extern uint32_t g_Result, g_Detect;
 
 void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID)
 {
@@ -119,7 +118,7 @@ void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChan
 }
 
 // обробатываем накопленные данные
-void sensor :: DataProcessing(uint16_t *data){
+uint32_t sensor :: DataProcessing(uint16_t *data){
 
 	if(!change_settings){
 		float Output = 0;
@@ -135,10 +134,11 @@ void sensor :: DataProcessing(uint16_t *data){
 
 		/**/
 		result = (uint16_t) (Output);
-		g_Result = result;
+
 	}else{
 		//Error_Handler();
 	}
+	return result;
 }
 
 // бегущее среднее с адаптивным коэффициентом
@@ -229,7 +229,7 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 		}
 
 	}
-	g_Detect = detect;
+	//g_Detect = detect;
 	return detect;
 }
 

@@ -36,7 +36,7 @@ public:
 	bool Getdetect();
 	bool StatusCalibration();
 
-	void DataProcessing(uint16_t *data);
+	uint32_t DataProcessing(uint16_t *data);
 	void CallDistance(); // считывает и сохраняет данные расстояния (расстояние до ленты)
 	int CallTime(); // считывает и сохраняет данные времени(размер ребер на ленте)
 	bool DetectPoll(uint32_t tRising = 0, uint32_t tFalling = 0);

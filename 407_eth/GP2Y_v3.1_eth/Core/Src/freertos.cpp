@@ -100,8 +100,8 @@ extern led LED_OSstart;
 vector<debugSensor> debugBuf;
 uint32_t debug_I = 0;
 bool debug_send = false;
-uint32_t g_Result, g_Detect;
-
+uint32_t  g_Result_S1, g_Result_S2;
+uint32_t g_Detect_S1, g_Detect_S2;
 //структуры для netcon
 extern struct netif gnetif;
 
@@ -244,6 +244,7 @@ void mainTask(void const * argument)
   /* USER CODE BEGIN mainTask */
 
 	float temp_distance_ul = 0.0;
+	bool temp_det = 0;
 
 	switch (settings.sensorType1) {
 	case 1: // оптика
@@ -317,7 +318,7 @@ void mainTask(void const * argument)
 				//вернуть мютекс
 				osMutexRelease(mutexADCHandle);
 				// обработать данные
-				Sensor1.DataProcessing(adc_buffer);
+				g_Result_S1 = Sensor1.DataProcessing(adc_buffer);
 				//start debug
 				if(debug_I <= 100){
 					debug_I++;
@@ -334,8 +335,13 @@ void mainTask(void const * argument)
 					}
 				}
 				//end debug
-
-				if(Sensor1.DetectPoll()){
+				temp_det = Sensor1.DetectPoll();
+				if(temp_det){
+					g_Detect_S1 = 1000;
+				}else {
+					g_Detect_S1 = 0;
+				}
+				if(temp_det){
 					LED_error.LEDon();
 				}else{
 					LED_error.LEDoff();
@@ -862,6 +868,7 @@ void mainTask2(void const * argument)
   /* USER CODE BEGIN mainTask2 */
 
 	float temp_distance_ul = 0.0;
+	bool temp_det = 0;
 
 	switch (settings.sensorType2) {
 	case 1: // оптика
@@ -931,10 +938,16 @@ void mainTask2(void const * argument)
 				//вернуть мютекс
 				osMutexRelease(mutexADCHandle);
 				// обработать данные
-				Sensor2.DataProcessing(adc_buffer2);
+				g_Result_S2 = Sensor2.DataProcessing(adc_buffer2);
 				//HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
 
-				if(Sensor2.DetectPoll()){
+				temp_det = Sensor2.DetectPoll();
+				if(temp_det){
+					g_Detect_S2 = 1000;
+				}else {
+					g_Detect_S2 = 0;
+				}
+				if(temp_det){
 					LED_IPadr.LEDon();
 				}else{
 					LED_IPadr.LEDoff();
