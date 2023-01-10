@@ -66,7 +66,7 @@ typedef struct
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define ID_STRING " GP2Y_v3.1_eth_09.01.23"
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/

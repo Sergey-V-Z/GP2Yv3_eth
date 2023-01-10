@@ -819,7 +819,9 @@ void eth_Task(void const * argument)
 										mem_spi.Write(settings);
 										arr_cmd[i].err = "OK";
 										break;
-
+									case 100:
+										arr_cmd[i].err = ID_STRING;
+										break;
 									default:
 										arr_cmd[i].err = "err_CMD";
 										break;
