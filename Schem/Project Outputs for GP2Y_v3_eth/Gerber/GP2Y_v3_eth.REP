@@ -2,6 +2,66 @@
 FileName = GP2Y_v3_eth.GBR
 AutoAperture = True
 *************************************************************
+Generating : Layer 2
+      File : GP2Y_v3_eth.G1
+
+    Adding Layer      : Layer 2
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D16
+    D88
+    D89
+    D91
+    D92
+    D93
+    D94
+    D95
+    D96
+    D98
+    D99
+    D100
+    D103
+    D105
+    D106
+*************************************************************
+
+*************************************************************
+Generating : Bottom Layer
+      File : GP2Y_v3_eth.GBL
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D16
+    D88
+    D89
+    D91
+    D92
+    D93
+    D94
+    D95
+    D96
+    D97
+    D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
+    D105
+    D106
+    D107
+*************************************************************
+
+*************************************************************
 Generating : Top Overlay
       File : GP2Y_v3_eth.GTO
 
@@ -23,20 +83,6 @@ Used DCodes :
 *************************************************************
 
 *************************************************************
-Generating : Bottom Paste
-      File : GP2Y_v3_eth.GBP
-
-    Adding Layer      : Bottom Paste
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-*************************************************************
-
-*************************************************************
 Generating : Top Solder
       File : GP2Y_v3_eth.GTS
 
@@ -48,10 +94,6 @@ Generating : Top Solder
 
 
 Used DCodes :
-    D43
-    D44
-    D45
-    D46
     D47
     D48
     D49
@@ -85,37 +127,14 @@ Used DCodes :
     D77
     D78
     D79
-*************************************************************
-
-*************************************************************
-Generating : Board
-      File : GP2Y_v3_eth.GM5
-
-    Adding Layer      : Board
-
-
-Used DCodes :
-*************************************************************
-
-*************************************************************
-Generating : Keep-Out Layer
-      File : GP2Y_v3_eth.GKO
-
-    Adding Layer      : Keep-Out Layer
-
-
-Used DCodes :
-    D14
-*************************************************************
-
-*************************************************************
-Generating : Bottom Overlay
-      File : GP2Y_v3_eth.GBO
-
-    Adding Layer      : Bottom Overlay
-
-
-Used DCodes :
+    D80
+    D81
+    D82
+    D83
+    D84
+    D85
+    D86
+    D87
 *************************************************************
 
 *************************************************************
@@ -128,9 +147,9 @@ Generating : Top Layer
 
 
 Used DCodes :
-    D12
-    D14
-    D15
+    D10
+    D11
+    D16
     D21
     D22
     D23
@@ -153,14 +172,10 @@ Used DCodes :
     D40
     D41
     D42
-    D80
-    D81
-    D82
-    D83
-    D84
-    D85
-    D86
-    D87
+    D43
+    D44
+    D45
+    D46
     D88
     D89
     D90
@@ -172,6 +187,14 @@ Used DCodes :
     D96
     D97
     D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
+    D105
+    D106
 *************************************************************
 
 *************************************************************
@@ -208,60 +231,17 @@ Used DCodes :
     D40
     D41
     D42
+    D43
+    D44
+    D45
+    D46
 *************************************************************
 
 *************************************************************
-Generating : Layer 2
-      File : GP2Y_v3_eth.G1
+Generating : Bottom Paste
+      File : GP2Y_v3_eth.GBP
 
-    Adding Layer      : Layer 2
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D12
-    D15
-    D80
-    D83
-    D84
-    D86
-    D87
-    D91
-    D92
-    D93
-    D94
-    D95
-    D97
-    D98
-*************************************************************
-
-*************************************************************
-Generating : Layer 3
-      File : GP2Y_v3_eth.G2
-
-    Adding Layer      : Layer 3
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D15
-    D80
-    D83
-    D84
-    D86
-    D87
-    D91
-    D93
-    D95
-    D97
-    D98
-*************************************************************
-
-*************************************************************
-Generating : Bottom Layer
-      File : GP2Y_v3_eth.GBL
+    Adding Layer      : Bottom Paste
 
     Adding Layer      : Bottom Layer
 
@@ -269,25 +249,6 @@ Generating : Bottom Layer
 
 
 Used DCodes :
-    D15
-    D80
-    D82
-    D83
-    D84
-    D85
-    D86
-    D87
-    D88
-    D89
-    D90
-    D91
-    D92
-    D93
-    D94
-    D95
-    D96
-    D97
-    D98
 *************************************************************
 
 *************************************************************
@@ -302,19 +263,73 @@ Generating : Bottom Solder
 
 
 Used DCodes :
-    D66
-    D67
-    D68
-    D69
-    D70
-    D71
-    D72
-    D73
     D74
     D75
     D76
     D77
     D78
     D79
+    D80
+    D81
+    D82
+    D83
+    D84
+    D85
+    D86
+    D87
+*************************************************************
+
+*************************************************************
+Generating : Layer 3
+      File : GP2Y_v3_eth.G2
+
+    Adding Layer      : Layer 3
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D16
+    D88
+    D91
+    D94
+    D96
+    D98
+    D99
+    D100
+    D103
+    D105
+    D106
+*************************************************************
+
+*************************************************************
+Generating : Board
+      File : GP2Y_v3_eth.GM5
+
+    Adding Layer      : Board
+
+
+Used DCodes :
+*************************************************************
+
+*************************************************************
+Generating : Keep-Out Layer
+      File : GP2Y_v3_eth.GKO
+
+    Adding Layer      : Keep-Out Layer
+
+
+Used DCodes :
+    D11
+*************************************************************
+
+*************************************************************
+Generating : Bottom Overlay
+      File : GP2Y_v3_eth.GBO
+
+    Adding Layer      : Bottom Overlay
+
+
+Used DCodes :
 *************************************************************
 

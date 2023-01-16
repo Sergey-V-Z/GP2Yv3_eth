@@ -38,6 +38,23 @@ PrefsVaultGUID=
 PrefsRevisionGUID=
 
 [Document1]
+DocumentPath=GP2Y_v3_eth.PCBDwf
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
+[Document2]
 DocumentPath=GP2Y_v3_eth.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -54,7 +71,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=MNQPJJKR
 
-[Document2]
+[Document3]
 DocumentPath=Job2.OutJob
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -71,7 +88,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document3]
+[Document4]
 DocumentPath=GP2Y_v3_eth.PcbDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -89,74 +106,82 @@ GenerateClassCluster=0
 DocumentUniqueId=JNUBCOAR
 
 [GeneratedDocument1]
-DocumentPath=Project Outputs for GP2Y_v3_eth\NC Drill\GP2Y_v3_eth.DRR
+DocumentPath=Project Outputs for GP2Y_v3_eth\BOM\Bill of Materials-GP2Y_v3_eth.xlsx
 DItemRevisionGUID=
 
 [GeneratedDocument2]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.EXTREP
+DocumentPath=Project Outputs for GP2Y_v3_eth\Design Rule Check - GP2Y_v3_eth.html
 DItemRevisionGUID=
 
 [GeneratedDocument3]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.G1
+DocumentPath=Project Outputs for GP2Y_v3_eth\NC Drill\GP2Y_v3_eth.DRR
 DItemRevisionGUID=
 
 [GeneratedDocument4]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.G2
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.EXTREP
 DItemRevisionGUID=
 
 [GeneratedDocument5]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBL
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.G1
 DItemRevisionGUID=
 
 [GeneratedDocument6]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBO
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.G2
 DItemRevisionGUID=
 
 [GeneratedDocument7]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBP
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBL
 DItemRevisionGUID=
 
 [GeneratedDocument8]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBS
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBO
 DItemRevisionGUID=
 
 [GeneratedDocument9]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GKO
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBP
 DItemRevisionGUID=
 
 [GeneratedDocument10]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GM5
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GBS
 DItemRevisionGUID=
 
 [GeneratedDocument11]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTL
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GKO
 DItemRevisionGUID=
 
 [GeneratedDocument12]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTO
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GM5
 DItemRevisionGUID=
 
 [GeneratedDocument13]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTP
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTL
 DItemRevisionGUID=
 
 [GeneratedDocument14]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTS
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTO
 DItemRevisionGUID=
 
 [GeneratedDocument15]
-DocumentPath=Project Outputs for GP2Y_v3_eth\NC Drill\GP2Y_v3_eth.LDP
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTP
 DItemRevisionGUID=
 
 [GeneratedDocument16]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.REP
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.GTS
 DItemRevisionGUID=
 
 [GeneratedDocument17]
-DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.RUL
+DocumentPath=Project Outputs for GP2Y_v3_eth\NC Drill\GP2Y_v3_eth.LDP
 DItemRevisionGUID=
 
 [GeneratedDocument18]
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.REP
+DItemRevisionGUID=
+
+[GeneratedDocument19]
+DocumentPath=Project Outputs for GP2Y_v3_eth\Gerber\GP2Y_v3_eth.RUL
+DItemRevisionGUID=
+
+[GeneratedDocument20]
 DocumentPath=Project Outputs for GP2Y_v3_eth\NC Drill\GP2Y_v3_eth.TXT
 DItemRevisionGUID=
 
@@ -279,7 +304,7 @@ OutputDefault20=0
 [OutputGroup2]
 Name=Simulator Outputs
 Description=
-TargetPrinter=Canon MG3600 series
+TargetPrinter=Microsoft Print to PDF
 PrinterOptions=Record=PrinterOptions|Copies=1|Duplex=1|TrueTypeOptions=3|Collate=1|PrintJobKind=1|PrintWhat=1
 
 [OutputGroup3]
