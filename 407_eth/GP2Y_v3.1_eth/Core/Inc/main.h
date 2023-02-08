@@ -36,25 +36,38 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-enum SensorType{
+typedef enum {
 	Optic,
-	Ultrasens,
+	Ultrasound,
 	NoInit,
-};
+}SensorType;
 
 typedef struct
 {
-	uint8_t sensorType1; // 1-Optic 2-ultrasens 3-Noinit
-	uint8_t sensorType2; // 1-Optic 2-ultrasens 3-Noinit
-	uint8_t  non_var;
-	uint8_t	MAC_end;
-	uint16_t triger1;
-	uint16_t triger2;
-	//uint16_t offsetMax;
-	uint32_t timeCall1;
-	uint32_t timeCall2;
-	uint32_t offsetTime;
+	uint32_t callTimeMin; 				//  = 0xFFFFFFFF минимальное время прохождения ребра измеренное при каллибровке
+	uint32_t callTimeMax;  				//  = 0 максимальное время прохождения ребра измеренное при каллибровке
+	uint32_t timOutFalling; 			// = 10
+}callTime_t;
 
+typedef struct
+{
+	uint32_t offsetTime;
+	uint16_t callDistanceMin;			//  = 0 зона работы датчика
+	uint16_t callDistanceMax;			//  = 4096 зона работы датчика
+	callTime_t timeParametrs[4];		// массив с разными каллибровками времени для разных скоростей
+	uint16_t chanelCallTime;			//  = 0 текущий канал каллибровки
+	uint16_t triger;					//  = 100 смещение от ленты
+	uint32_t timeCall;					//  = 5000 время выполнение калибровки
+	uint16_t modePwr;					// режим работы питания
+	float k_H;							// = 0.1 коэфицент фильтра для быстрых изменений ( начальное 0.9)
+	float k_L;							// = 0.03 коэфицент фильтра для медленных изменений
+	SensorType sensorType;				// = NoInit
+}sensorSett_t;
+
+typedef struct
+{
+	uint8_t	MAC_end;
+	sensorSett_t sensorSett[2];
 }settings_t;
 
 /* USER CODE END ET */
@@ -103,6 +116,7 @@ void Error_Handler(void);
 #define WP_GPIO_Port GPIOD
 #define HOLD_Pin GPIO_PIN_1
 #define HOLD_GPIO_Port GPIOD
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

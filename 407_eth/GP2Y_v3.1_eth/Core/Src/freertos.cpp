@@ -123,6 +123,7 @@ osThreadId debug_udpHandle;
 osMutexId s2DistanceMutexHandle;
 osMutexId mutexADCHandle;
 osMutexId s1DistanceMutexHandle;
+osMutexId setMutexHandle;
 osSemaphoreId ADC_endHandle;
 osSemaphoreId ADC_end2Handle;
 
@@ -177,6 +178,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of s1DistanceMutex */
   osMutexDef(s1DistanceMutex);
   s1DistanceMutexHandle = osMutexCreate(osMutex(s1DistanceMutex));
+
+  /* definition and creation of setMutex */
+  osMutexDef(setMutex);
+  setMutexHandle = osMutexCreate(osMutex(setMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
 	/* add mutexes, ... */
@@ -245,14 +250,15 @@ void mainTask(void const * argument)
 
 	float temp_distance_ul = 0.0;
 	bool temp_det = 0;
+	uint16_t id = 1;
 
-	switch (settings.sensorType1) {
+	switch (settings.sensorSett[id].sensorType) {
 	case 1: // оптика
-		Sensor1.Init(&ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, 1);
-		Sensor1.SetTimeCall(settings.timeCall1);
+		Sensor1.Init(&settings, &ADC_endHandle, &hadc1, adc_buffer, pwr1_GPIO_Port, pwr1_Pin, id);
+		//Sensor1.SetTimeCall(settings.timeCall1);
 		break;
 	case 2: // ултразвук
-		Sensor1.Init(TIM3,TIM_CHANNEL_1 ,TIM_CHANNEL_2, pwr1_GPIO_Port, pwr1_Pin, 1);
+		Sensor1.Init(&settings, TIM3,TIM_CHANNEL_1 ,TIM_CHANNEL_2, pwr1_GPIO_Port, pwr1_Pin, id);
 
 		break;
 	default:
@@ -268,7 +274,7 @@ void mainTask(void const * argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		switch (settings.sensorType1) {
+		switch (settings.sensorSett[id].sensorType) {
 		case 1: // оптика
 			switch (call1) {
 			case 1: // каллибровка дистанции
@@ -276,14 +282,12 @@ void mainTask(void const * argument)
 				//взять мютекс
 				osMutexWait(mutexADCHandle, osWaitForever);
 
-				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET); // питение
 				Sensor1.PwrSet(2); // pwr on
 				LED_error.LEDon();
 				osDelay(300);
 				Sensor1.CallDistance();
 				LED_error.LEDoff();
 				Sensor1.PwrSet(3); // pwr off
-				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET); // питение
 
 				//вернуть мютекс
 				osMutexRelease(mutexADCHandle);
@@ -293,7 +297,6 @@ void mainTask(void const * argument)
 				//взять мютекс
 				osMutexWait(mutexADCHandle, osWaitForever);
 
-				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_SET); // питение
 				Sensor1.PwrSet(2); // pwr on
 				LED_error.LEDon();
 				osDelay(300);
@@ -303,7 +306,6 @@ void mainTask(void const * argument)
 				}
 				LED_error.LEDoff();
 				Sensor1.PwrSet(3); // pwr off
-				//HAL_GPIO_WritePin(pwr1_GPIO_Port, pwr1_Pin, GPIO_PIN_RESET); // питение
 
 				//вернуть мютекс
 				osMutexRelease(mutexADCHandle);
@@ -671,12 +673,12 @@ void eth_Task(void const * argument)
 										break;
 									case 15:
 										Sensor1.SetTimeCall(arr_cmd[i].data_in);
-										settings.timeCall1 = arr_cmd[i].data_in;
+										//settings.timeCall1 = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
 									case 16:
 										Sensor2.SetTimeCall(arr_cmd[i].data_in);
-										settings.timeCall2 = arr_cmd[i].data_in;
+										//settings.timeCall2 = arr_cmd[i].data_in;
 										arr_cmd[i].err = "OK";
 										break;
 									case 17:
@@ -687,10 +689,10 @@ void eth_Task(void const * argument)
 										break;
 									case 18://включение в качестве первого сенсора ултразвук
 										if(arr_cmd[i].data_in == 1){
-											settings.sensorType1 = 1;
+											Sensor1.SetSensorType(Optic);
 											arr_cmd[i].err = "OK";
 										}else if (arr_cmd[i].data_in == 2){
-											settings.sensorType1 = 2;
+											Sensor1.SetSensorType(Ultrasound);
 											arr_cmd[i].err = "OK";
 										}else{
 											arr_cmd[i].err = "errData";
@@ -705,10 +707,10 @@ void eth_Task(void const * argument)
 										break;
 									case 20://включение в качестве второго сенсора ултразвук
 										if(arr_cmd[i].data_in == 1){
-											settings.sensorType2 = 1;
+											Sensor2.SetSensorType(Optic);
 											arr_cmd[i].err = "OK";
 										}else if (arr_cmd[i].data_in == 2){
-											settings.sensorType2 = 2;
+											Sensor2.SetSensorType(Ultrasound);
 											arr_cmd[i].err = "OK";
 										}else{
 											arr_cmd[i].err = "errData";
@@ -871,15 +873,15 @@ void mainTask2(void const * argument)
 
 	float temp_distance_ul = 0.0;
 	bool temp_det = 0;
+	uint32_t id = 2;
 
-	switch (settings.sensorType2) {
+	switch (settings.sensorSett[id].sensorType) {
 	case 1: // оптика
-		Sensor2.Init(&ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, 2);
-		HAL_ADC_Start_DMA(&hadc2, (uint32_t*)&adc_buffer2, Sensor2.Depth);
-		Sensor2.SetTimeCall(settings.timeCall2);
+		Sensor2.Init(&settings, &ADC_end2Handle, &hadc2, adc_buffer2, pwr2_GPIO_Port, pwr2_Pin, id);
+		//Sensor2.SetTimeCall(settings.timeCall2);
 		break;
 	case 2: // ултразвук
-		Sensor2.Init(TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, pwr2_GPIO_Port, pwr2_Pin, 2);
+		Sensor2.Init(&settings, TIM4,TIM_CHANNEL_1 ,TIM_CHANNEL_2, pwr2_GPIO_Port, pwr2_Pin, id);
 
 		break;
 	default:
@@ -890,7 +892,7 @@ void mainTask2(void const * argument)
 	/* Infinite loop */
 	for(;;)
 	{
-		switch (settings.sensorType2) {
+		switch (settings.sensorSett[id].sensorType) {
 		case 1: // оптика
 			switch (call2) {
 			case 1: // каллибровка дистанции

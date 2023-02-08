@@ -4,12 +4,14 @@
 //extern ADC_HandleTypeDef hadc2;
 //extern ADC_HandleTypeDef hadc1;
 //extern uint16_t adc_buffer[1024];
+extern osSemaphoreId setMutexHandle;
 
-void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID)
+void sensor :: Init(settings_t *set, osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint16_t *adc_buffer, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID)
 {
+	setttings = set;
 	id = ID;
-	if(sensorType == NoInit){
-		sensorType = Optic;
+	if(setttings->sensorSett[id].sensorType == NoInit){
+		setttings->sensorSett[id].sensorType = Optic;
 
 		this->ADC_endHandle = ADC_endHandle;
 		this->hadc = hadc;
@@ -21,11 +23,12 @@ void sensor :: Init(osSemaphoreId *ADC_endHandle, ADC_HandleTypeDef *hadc, uint1
 	}
 }
 
-void sensor :: Init(TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID, float soundSpeed)
+void sensor :: Init(settings_t *set, TIM_TypeDef* tim, uint32_t triggerChannel, uint32_t echoChannel, GPIO_TypeDef* GPIO_pwr, uint16_t Pin_pwr, int ID, float soundSpeed)
 {
+	setttings = set;
 	id = ID;
-	if(sensorType == NoInit){
-		sensorType = Ultrasound;
+	if(setttings->sensorSett[id].sensorType == NoInit){
+		setttings->sensorSett[id].sensorType = Ultrasound;
 
 		// default driver state
 		echoPulseStart = 0;
@@ -144,7 +147,12 @@ uint32_t sensor :: DataProcessing(uint16_t *data){
 // бегущее среднее с адаптивным коэффициентом
 float sensor :: ExpRunningAvgAdaptive(float newVal) {
 	static float filVal = 0;
+	float k_H, k_L;
 
+	xSemaphoreTake(setMutexHandle, 100);
+	k_H = setttings->sensorSett[id].k_H;
+	k_L = setttings->sensorSett[id].k_L;
+	xSemaphoreGive(setMutexHandle);
 	// резкость фильтра зависит от модуля разности значений
 	if (abs(newVal - filVal) > 1.5) filVal += (newVal - filVal) *  k_H;
 	else filVal += (newVal - filVal) *  k_L;
@@ -160,24 +168,27 @@ bool sensor :: DetectPoll(uint32_t tRising, uint32_t tFalling){
 	// если таймауты не переданы в функцию или они нулевые выставляем из откалиброванных данных
 	if(tRising == 0 && tFalling == 0){
 
-		if(chanelCallTime == 0){
-			tempTimeOutRising = 0;
-			tempTimeOutFalling = 0;
-		}else{
-			tempTimeOutRising = callTime[chanelCallTime].callTimeMax + offsetTime;
-			tempTimeOutFalling = callTime[chanelCallTime].timOutFalling;
+		if(setttings->sensorSett[id].chanelCallTime == 0){
+			setttings->sensorSett[id].chanelCallTime = 1;
 		}
 
+		xSemaphoreTake(setMutexHandle, 100);
+		tempTimeOutRising = setttings->sensorSett[id].timeParametrs[setttings->sensorSett[id].chanelCallTime].callTimeMax + setttings->sensorSett[id].offsetTime;
+		tempTimeOutFalling = setttings->sensorSett[id].timeParametrs[setttings->sensorSett[id].chanelCallTime].timOutFalling;
+		xSemaphoreGive(setMutexHandle);
 	}else{
 		tempTimeOutRising = tRising;
 		tempTimeOutFalling = tFalling;
 	}
 
+	xSemaphoreTake(setMutexHandle, 100);
+	uint16_t temp = (setttings->sensorSett[id].callDistanceMin + setttings->sensorSett[id].triger);
+	xSemaphoreGive(setMutexHandle);
+
 	// если у нас сработка по входным данным и низкий уровень по выходу
-	if(result > (callDistanceMin + triger)){
+	if(result > temp){
 
 		if(detect == false){ // если сработки нету то проходим процедуру
-
 			if(oldTimeRising == 0){
 				oldTimeRising = HAL_GetTick();
 			}
@@ -241,7 +252,10 @@ void sensor :: CallDistance(){
 	//добавить защиту при переходе времени через 0
 
 	uint32_t old_time = HAL_GetTick();
-	uint32_t timeF1 = timeCall;
+	xSemaphoreTake(setMutexHandle, 100);
+	uint32_t timeF1 = setttings->sensorSett[id].timeCall;
+	xSemaphoreGive(setMutexHandle);
+
 	//uint32_t timeF2 = timeCall - timeF1;
 
 	//uint32_t timePulse = 0;
@@ -268,9 +282,11 @@ void sensor :: CallDistance(){
 	}
 	while(!(timeF1 <= (HAL_GetTick() - old_time)));
 
-
-	callDistanceMax = peak;
-	callDistanceMin = gorge;
+	//пишем настройки
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].callDistanceMax = peak;
+	setttings->sensorSett[id].callDistanceMin = gorge;
+	xSemaphoreGive(setMutexHandle);
 
 	calibrationInProgress = false;
 }
@@ -278,17 +294,18 @@ void sensor :: CallDistance(){
 int sensor :: CallTime(){
 
 	calibrationInProgress = true;
-	//если канал не установлен выходим из функции
-	if(chanelCallTime == 0){
 
-		return 0;
+	//если канал не установлен ставим канал 1
+	xSemaphoreTake(setMutexHandle, 100);
+	if(setttings->sensorSett[id].chanelCallTime == 0){
+		setttings->sensorSett[id].chanelCallTime = 1;
 	}
+	uint32_t timeF2 = setttings->sensorSett[id].timeCall;
+	xSemaphoreGive(setMutexHandle);
+
 	//добавить защиту при переходе времени через 0
 
 	uint32_t old_time = HAL_GetTick();
-	//uint32_t timeF1 = timeCall;
-	uint32_t timeF2 = timeCall;
-
 	uint32_t timePulse = 0;
 	uint32_t timePulseOld = 0;
 	uint32_t timePulseMin = 0;
@@ -325,15 +342,18 @@ int sensor :: CallTime(){
 	}
 	while(!(timeF2 <= (HAL_GetTick() - old_time)));
 
-	callTime[chanelCallTime].callTimeMax = timePulseMax;
-	callTime[chanelCallTime].callTimeMin = timePulseMin;
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].timeParametrs[setttings->sensorSett[id].chanelCallTime].callTimeMax = timePulseMax;
+	setttings->sensorSett[id].timeParametrs[setttings->sensorSett[id].chanelCallTime].callTimeMin = timePulseMin;
+	xSemaphoreGive(setMutexHandle);
 
 	calibrationInProgress = false;
 	return 1;
 }
 
 bool sensor :: Getdetect(){
-	if (modePwr == 1) {
+	//mutex heare
+	if (setttings->sensorSett[id].modePwr == 1) {
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 	}
 	return detect;
@@ -343,12 +363,16 @@ void sensor :: PwrSet(uint16_t r){
 
 	switch (r) {
 	case 1:
-		modePwr = 1; // режим при котором питание отключается при чтении
+		xSemaphoreTake(setMutexHandle, 100);
+		setttings->sensorSett[id].modePwr = 1; // режим при котором питание отключается при чтении
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_SET);
+		xSemaphoreGive(setMutexHandle);
 		break;
 	case 2:
-		modePwr = 2; // режим при котором питание отключается только принудительно
+		xSemaphoreTake(setMutexHandle, 100);
+		setttings->sensorSett[id].modePwr = 2; // режим при котором питание отключается только принудительно
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_SET);
+		xSemaphoreGive(setMutexHandle);
 		break;
 	case 3:
 		HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
@@ -361,13 +385,14 @@ void sensor :: PwrSet(uint16_t r){
 
 uint16_t sensor :: GetResult(){
 	uint16_t Ret = 0;
-	switch (sensorType) {
+	switch (setttings->sensorSett[id].sensorType) {
 	case Optic: // оптика
-		//перенести выключение в pool  сделать его через флаг
-		if (modePwr == 1) {
+		//перенести выключение в pool сделать его через флаг (Нужно ли?)
+		xSemaphoreTake(setMutexHandle, 100);
+		if (setttings->sensorSett[id].modePwr == 1) {
 			HAL_GPIO_WritePin(GPIO_pwr, Pin_pwr, GPIO_PIN_RESET);
 		}
-
+		xSemaphoreGive(setMutexHandle);
 		Ret = result;
 		break;
 	case Ultrasound: // ултразвук
@@ -384,27 +409,41 @@ uint16_t sensor :: GetResult(){
 }
 
 void sensor :: SetOffsetMin(uint16_t offset){
-	callDistanceMin = offset;
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].callDistanceMin = offset;
+	xSemaphoreGive(setMutexHandle);
 }
 
 void sensor :: SetTrigger(uint16_t offset){
-	sensor :: triger = offset;
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].triger = offset;
+	xSemaphoreGive(setMutexHandle);
 }
 
 void sensor :: SetOffsetMax(uint16_t offset){
-	callDistanceMax = offset;
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].callDistanceMax = offset;
+	xSemaphoreGive(setMutexHandle);
 }
 
 void sensor :: SetTimeCall(uint32_t time){
-	timeCall = time;
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].timeCall = time;
+	xSemaphoreGive(setMutexHandle);
 }
 
 uint16_t sensor :: GetOffsetMin(){
-	return callDistanceMin;
+	xSemaphoreTake(setMutexHandle, 100);
+	uint16_t ret = setttings->sensorSett[id].callDistanceMin;
+	xSemaphoreGive(setMutexHandle);
+	return ret;
 }
 
 uint16_t sensor :: GetOffsetMax(){
-	return callDistanceMax;
+	xSemaphoreTake(setMutexHandle, 100);
+	uint16_t ret = setttings->sensorSett[id].callDistanceMax;
+	xSemaphoreGive(setMutexHandle);
+	return ret;
 }
 
 //for hcsr04
@@ -457,15 +496,23 @@ float sensor :: GetDistance()
 }
 
 void sensor::SetCallChanel(uint16_t ch) {
-	chanelCallTime = ch;
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].chanelCallTime = ch;
+	xSemaphoreGive(setMutexHandle);
 }
 
 uint16_t sensor::GetCallChanel() {
-	return chanelCallTime;
+	xSemaphoreTake(setMutexHandle, 100);
+	uint16_t ret = setttings->sensorSett[id].chanelCallTime;
+	xSemaphoreGive(setMutexHandle);
+	return ret;
 }
 
 uint16_t sensor::GetTrigger(){
-	return triger;
+	xSemaphoreTake(setMutexHandle, 100);
+	uint16_t ret = setttings->sensorSett[id].triger;
+	xSemaphoreGive(setMutexHandle);
+	return ret;
 }
 
 bool sensor::StatusCalibration() {
@@ -473,28 +520,44 @@ bool sensor::StatusCalibration() {
 }
 
 void sensor::SetOffsetTime(uint32_t time) {
-	offsetTime = time;
+	setttings->sensorSett[id].offsetTime = time;
 }
 
 uint32_t sensor::GetOffsetTime() {
-	return offsetTime;
+	return setttings->sensorSett[id].offsetTime;
 }
 
 uint32_t sensor::GetTimeoutRasing() {
-	if(chanelCallTime == 0){
-		return 0;
+	uint16_t ret = 0;
+	xSemaphoreTake(setMutexHandle, 100);
+	if(setttings->sensorSett[id].chanelCallTime == 0){
+		setttings->sensorSett[id].chanelCallTime = 1;
 	}
-	else{
-		return callTime[chanelCallTime].callTimeMax;
-	}
+	ret = setttings->sensorSett[id].timeParametrs[setttings->sensorSett[id].chanelCallTime].callTimeMax;
+	xSemaphoreGive(setMutexHandle);
 
+	return ret;
 }
 
 void sensor::SetTimeoutRasing(uint32_t time) {
-	if(chanelCallTime == 0){
-		//
+
+	xSemaphoreTake(setMutexHandle, 100);
+	if(setttings->sensorSett[id].chanelCallTime == 0){
+		setttings->sensorSett[id].chanelCallTime = 1;
 	}
-	else{
-		callTime[chanelCallTime].callTimeMax = time;
-	}
+	setttings->sensorSett[id].timeParametrs[setttings->sensorSett[id].chanelCallTime].callTimeMax = time;
+	xSemaphoreGive(setMutexHandle);
+}
+
+void sensor::SetSensorType(SensorType type) {
+	xSemaphoreTake(setMutexHandle, 100);
+	setttings->sensorSett[id].sensorType = type;
+	xSemaphoreGive(setMutexHandle);
+}
+
+SensorType sensor::GetSensorType() {
+	xSemaphoreTake(setMutexHandle, 100);
+	SensorType type = setttings->sensorSett[id].sensorType;
+	xSemaphoreGive(setMutexHandle);
+	return type;
 }
